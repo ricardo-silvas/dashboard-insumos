@@ -3,7 +3,8 @@ const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
 
 const INDICATORS = [
     { id: 'algodao', name: 'Algodão', subtitle: 'Mercado Físico - CEPEA/ESALQ', unit: 'libra-peso', url: 'https://www.cepea.org.br/br/indicador/algodao.aspx', type: 'cepea' },
-    { id: 'cafe', name: 'Café Arábica', subtitle: 'Mercado Físico - CEPEA/ESALQ', unit: 'sc 60kg', url: 'https://www.cepea.org.br/br/indicador/cafe.aspx', type: 'cepea' },
+    { id: 'cafe_arabica', name: 'Café Arábica', subtitle: 'Mercado Físico - CEPEA/ESALQ', unit: 'sc 60kg', url: 'https://www.cepea.org.br/br/indicador/cafe.aspx', type: 'cepea', selector: '#imagenet-indicador1' },
+    { id: 'cafe_robusta', name: 'Café Robusta', subtitle: 'Mercado Físico - CEPEA/ESALQ', unit: 'sc 60kg', url: 'https://www.cepea.org.br/br/indicador/cafe.aspx', type: 'cepea', selector: '#imagenet-indicador2' },
     { id: 'acucar_cristal', name: 'Açúcar Cristal', subtitle: 'Empacotado SP - CEPEA/ESALQ', unit: 'sc 50kg', url: 'https://www.cepea.org.br/br/indicador/acucar-cristal-empacotado-cepea-esalq-sao-paulo.aspx', type: 'cepea' },
     { id: 'acucar_ref', name: 'Açúcar Refinado', subtitle: 'Amorfo SP - CEPEA/ESALQ', unit: 'sc 50kg', url: 'https://www.cepea.org.br/br/indicador/acucar-refinado-amorfo-sp.aspx', type: 'cepea' },
     { id: 'aluminio', name: 'Alumínio (LME)', subtitle: 'London Metal Exchange (Dados Estimados)', unit: 'tonelada', type: 'mock' },
@@ -30,7 +31,7 @@ async function fetchAllData() {
         try {
             let history = [];
             if (ind.type === 'cepea') {
-                history = await fetchCEPEA(ind.url);
+                history = await fetchCEPEA(ind.url, ind.selector);
             } else if (ind.type === 'dolar') {
                 history = await fetchDolar();
             } else if (ind.type === 'mock') {
@@ -73,7 +74,7 @@ async function fetchAllData() {
     }
 }
 
-async function fetchCEPEA(url) {
+async function fetchCEPEA(url, selector = null) {
     // Utilize CORS proxy
     const res = await fetch(CORS_PROXY + encodeURIComponent(url));
     const json = await res.json();
@@ -81,8 +82,8 @@ async function fetchCEPEA(url) {
     const doc = parser.parseFromString(json.contents, 'text/html');
     
     // Find table inside typical CEPEA indicator wrappers
-    const table = doc.querySelector('#imagenet-indicador1') || doc.querySelector('.table-responsive table') || doc.querySelector('table');
-    if (!table) throw new Error("Tabela não encontrada em " + url);
+    const table = (selector ? doc.querySelector(selector) : null) || doc.querySelector('#imagenet-indicador1') || doc.querySelector('.table-responsive table') || doc.querySelector('table');
+    if (!table) throw new Error("Tabela não encontrada em " + url + (selector ? " com seletor " + selector : ""));
     
     const rows = table.querySelectorAll('tbody tr');
     let history = [];
@@ -135,7 +136,8 @@ function fetchAluminio() {
 function generateFallbackData(metricId) {
     let basePrices = {
         'algodao': 415.50,
-        'cafe': 1250.00,
+        'cafe_arabica': 1250.00,
+        'cafe_robusta': 937.00,
         'acucar_cristal': 145.80,
         'acucar_ref': 160.20,
         'aluminio': 13450.00,
