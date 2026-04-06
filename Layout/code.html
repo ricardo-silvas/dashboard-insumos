@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Terminal Alumínio - Pro</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#B72C31",
+              "secondary": "#4A4A4A",
+              "background-light": "#f8f6f6",
+              "background-dark": "#1f1313",
+              "surface-container-high": "#eae8e7",
+              "surface-bright": "#fbf9f8",
+              "surface-dim": "#dbd9d9",
+              "on-surface": "#1b1c1c",
+              "on-secondary": "#ffffff",
+              "outline": "#8d706e",
+              "surface-container-low": "#f5f3f3",
+              "surface-container-highest": "#e4e2e2",
+              "surface-container": "#efeded",
+              "error": "#ba1a1a"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif", "serif"],
+              "body": ["Plus Jakarta Sans", "sans-serif"],
+              "label": ["Plus Jakarta Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }</script>
+<style>
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-ticker {
+            display: inline-flex;
+            animation: ticker-scroll 30s linear infinite;
+        }
+        .waterfall-gradient {
+            background: linear-gradient(180deg, rgba(149, 15, 28, 0.05) 0%, rgba(251, 249, 248, 0) 100%);
+        }
+        .chart-grid {
+            background-image: linear-gradient(to right, rgba(225, 190, 188, 0.2) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(225, 190, 188, 0.2) 1px, transparent 1px);
+            background-size: 4rem 4rem;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface flex flex-col min-h-screen selection:bg-primary-fixed selection:text-on-primary-fixed overflow-hidden">
+<!-- TopAppBar -->
+<nav class="bg-white/80 dark:bg-stone-900/80 backdrop-blur-md shadow-md dark:shadow-stone-950/50 flex justify-between items-center w-full px-8 h-24 z-50 fixed top-0 left-0 right-0">
+<div class="flex items-center gap-6 justify-center flex-1">
+<div class="bg-surface-container-high px-6 py-3 rounded-lg shadow-sm">
+<h1 class="text-2xl font-headline font-bold tracking-tight text-neutral-900 uppercase">INDICADORES DE COMPRAS FORTPEL - COMMODITIES</h1>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="text-right mr-4">
+<p class="text-xs font-label uppercase tracking-widest text-secondary text-[#4A4A4A]">Terminal v4.02</p>
+<p class="text-sm font-bold text-primary text-[#B72C31]">LIVE MARKET ACCESS</p>
+</div>
+<img alt="Fortpel Logo" class="h-16 w-auto object-contain" data-alt="professional corporate logo for industrial company with bold geometric lines and professional red and gray colors" src="https://lh3.googleusercontent.com/aida/ADBb0ug_16UUxU7gz5GIyEPNuwUSiFmq_020GRsCOOIaPE-moFt-5FWWQiJ5CdXsG-wwvGr5ZvgOOARWRB7ZJWCTtQbz91yqyT6F6dCOxCw8nsZp6mO3A3kVfmfPM_J7-_L7z9t-1922YISBQyA2SHXqBhjYWpe1GvoCUPtYwLT4mdRbe5MBCkLP-5yw1X1JsBRthqzt6gnBl7bfa9F5GBAWvVaqasm07Fh_7hFJzOME6qKGeoVH2DeGB7SuHrI1HWsAd7ozfhUEPsp9PQ"/>
+</div>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-1 mt-24 mb-12 p-8 grid grid-cols-12 gap-8 h-[calc(100vh-144px)] overflow-hidden">
+<!-- Left Column: Performance Chart -->
+<section class="col-span-8 flex flex-col gap-6">
+<header class="flex justify-between items-end">
+<div>
+<h2 class="text-4xl font-headline font-semibold text-primary text-[#B72C31]">ALUMÍNIO (LME)</h2>
+<p class="text-secondary font-label mt-1 text-[#4A4A4A]">Variação Histórica Mensal - London Metal Exchange</p>
+</div>
+<div class="flex gap-4 items-center">
+<div class="flex items-center gap-2 px-3 py-1 bg-surface-container rounded-full">
+<span class="w-2 h-2 bg-primary rounded-full bg-[#B72C31]"></span>
+<span class="text-xs font-bold uppercase tracking-tighter">Valor de Fechamento</span>
+</div>
+<span class="material-symbols-outlined text-outline">trending_up</span>
+</div>
+</header>
+<div class="flex-1 bg-surface-container-low rounded-xl relative chart-grid p-8 overflow-hidden group">
+<!-- Data Labels (Asymmetric Editorial Style) -->
+<div class="absolute top-8 left-8 z-10">
+<div class="text-6xl font-headline font-bold text-on-surface opacity-90 leading-none">R$ 13.482,50</div>
+<div class="flex items-center gap-2 text-primary mt-2 text-[#B72C31]">
+<span class="material-symbols-outlined font-bold">arrow_upward</span>
+<span class="font-bold text-xl">+4.82% esta semana</span>
+</div>
+</div>
+<!-- SVG Visualization (Representational Line Chart) -->
+<div class="absolute inset-x-0 bottom-0 h-2/3 px-4">
+<svg class="w-full h-full drop-shadow-2xl" preserveaspectratio="none" viewbox="0 0 1000 400">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#B72C31" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#B72C31" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,400 L0,320 C100,300 200,340 300,280 C400,220 500,240 600,180 C700,120 800,140 900,80 L1000,60 L1000,400 Z" fill="url(#chartGradient)"></path>
+<path d="M0,320 C100,300 200,340 300,280 C400,220 500,240 600,180 C700,120 800,140 900,80 L1000,60" fill="none" stroke="#B72C31" stroke-linecap="round" stroke-width="4"></path>
+<!-- Data Points -->
+<circle cx="0" cy="320" fill="#B72C31" r="4"></circle>
+<circle cx="300" cy="280" fill="#B72C31" r="4"></circle>
+<circle cx="600" cy="180" fill="#B72C31" r="4"></circle>
+<circle class="animate-pulse" cx="1000" cy="60" fill="#B72C31" r="6"></circle>
+</svg>
+</div>
+<!-- X-Axis Labels -->
+<div class="absolute bottom-4 inset-x-8 flex justify-between text-[10px] font-bold text-secondary-fixed-dim uppercase tracking-widest">
+<span>30 dias atrás</span>
+<span>15 dias atrás</span>
+<span>Hoje</span>
+</div>
+</div>
+</section>
+<!-- Right Column: Transactions List -->
+<section class="col-span-4 flex flex-col gap-6">
+<header class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-container">list_alt</span>
+<h3 class="text-xl font-headline font-bold text-on-surface uppercase tracking-tight">Últimos 30 Dias</h3>
+</header>
+<div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar">
+<!-- Waterfall Style Rows (7 visible) -->
+<div class="flex flex-col gap-2">
+<!-- Row 1 (Active/Newest) -->
+<div class="flex items-center justify-between p-4 bg-primary text-on-primary rounded-lg shadow-md transform hover:scale-[1.02] transition-transform bg-[#B72C31]">
+<div class="flex flex-col">
+<span class="text-xs opacity-80 font-bold uppercase">24 Mai 2024</span>
+<span class="font-headline font-bold text-lg">R$ 13.482,50</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-xs font-bold uppercase px-2 py-0.5 bg-on-primary/20 rounded">+1.2%</span>
+<span class="material-symbols-outlined mt-1">trending_up</span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-highest rounded-lg border-l-4 border-primary/40 border-[#B72C31]/40">
+<div class="flex flex-col">
+<span class="text-xs text-secondary font-bold uppercase text-[#4A4A4A]">23 Mai 2024</span>
+<span class="font-body font-bold text-on-surface">R$ 13.310,00</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-xs font-bold text-primary text-[#B72C31]">+0.85%</span>
+<span class="text-[10px] text-secondary font-medium text-[#4A4A4A]">LME Closing</span>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="flex items-center justify-between p-4 bg-surface-container rounded-lg">
+<div class="flex flex-col">
+<span class="text-xs text-secondary font-bold uppercase text-[#4A4A4A]">22 Mai 2024</span>
+<span class="font-body font-bold text-on-surface">R$ 13.200,00</span>
+</div>
+<div class="flex flex-col items-end text-error">
+<span class="text-xs font-bold">-0.42%</span>
+<span class="material-symbols-outlined text-sm">trending_down</span>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
+<div class="flex flex-col">
+<span class="text-xs text-secondary font-bold uppercase text-[#4A4A4A]">21 Mai 2024</span>
+<span class="font-body font-bold text-on-surface">R$ 13.255,00</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-xs font-bold text-primary text-[#B72C31]">+2.10%</span>
+</div>
+</div>
+<!-- Row 5 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-lg">
+<div class="flex flex-col">
+<span class="text-xs text-secondary font-bold uppercase text-[#4A4A4A]">20 Mai 2024</span>
+<span class="font-body font-bold text-on-surface">R$ 13.000,00</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-xs font-bold text-secondary text-[#4A4A4A]">0.00%</span>
+</div>
+</div>
+<!-- Row 6 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low/50 rounded-lg">
+<div class="flex flex-col">
+<span class="text-xs text-secondary font-bold uppercase text-[#4A4A4A]">19 Mai 2024</span>
+<span class="font-body font-bold text-on-surface/70">R$ 13.000,00</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-xs font-bold text-error">-1.20%</span>
+</div>
+</div>
+<!-- Row 7 -->
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest/50 rounded-lg">
+<div class="flex flex-col">
+<span class="text-xs text-secondary font-bold uppercase text-[#4A4A4A]">18 Mai 2024</span>
+<span class="font-body font-bold text-on-surface/50">R$ 13.150,00</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-xs font-bold text-secondary/50">+0.15%</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Ticker -->
+<footer class="bg-stone-100 dark:bg-stone-900 fixed bottom-0 w-full h-12 flex items-center overflow-hidden whitespace-nowrap z-50">
+<div class="bg-primary px-6 h-full flex items-center z-10 shadow-lg bg-[#B72C31]">
+<span class="text-on-primary font-bold tracking-widest text-sm uppercase">Global Ticker</span>
+</div>
+<div class="flex-1 relative overflow-hidden flex items-center">
+<div class="animate-ticker">
+<div class="flex items-center gap-12 px-8">
+<span class="flex items-center gap-2">
+<b class="text-on-secondary-fixed">COPPER (LME):</b>
+<span class="text-primary font-bold font-body text-[#B72C31]">$ 9,842.00</span>
+<span class="text-xs text-primary text-[#B72C31]">(+1.2%)</span>
+</span>
+<span class="flex items-center gap-2">
+<b class="text-on-secondary-fixed">ZINC (LME):</b>
+<span class="text-primary font-bold font-body text-[#B72C31]">$ 3,025.50</span>
+<span class="text-xs text-error">(-0.5%)</span>
+</span>
+<span class="flex items-center gap-2">
+<b class="text-on-secondary-fixed">BRENT OIL:</b>
+<span class="text-primary font-bold font-body text-[#B72C31]">$ 82.15</span>
+<span class="text-xs text-primary text-[#B72C31]">(+0.8%)</span>
+</span>
+<span class="flex items-center gap-2">
+<b class="text-on-secondary-fixed">USD/BRL:</b>
+<span class="text-primary font-bold font-body text-[#B72C31]">R$ 5.142</span>
+<span class="text-xs text-error">(-0.2%)</span>
+</span>
+<span class="flex items-center gap-2">
+<b class="text-on-secondary-fixed">Real-time Commodity Ticker: Fortpel Industrial Ledger © 2024</b>
+</span>
+</div>
+<!-- Duplicate for seamless scroll -->
+<div class="flex items-center gap-12 px-8">
+<span class="flex items-center gap-2">
+<b class="text-on-secondary-fixed">COPPER (LME):</b>
+<span class="text-primary font-bold font-body text-[#B72C31]">$ 9,842.00</span>
+<span class="text-xs text-primary text-[#B72C31]">(+1.2%)</span>
+</span>
+<span class="flex items-center gap-2">
+<b class="text-on-secondary-fixed">ZINC (LME):</b>
+<span class="text-primary font-bold font-body text-[#B72C31]">$ 3,025.50</span>
+<span class="text-xs text-error">(-0.5%)</span>
+</span>
+<span class="flex items-center gap-2">
+<b class="text-on-secondary-fixed">BRENT OIL:</b>
+<span class="text-primary font-bold font-body text-[#B72C31]">$ 82.15</span>
+<span class="text-xs text-primary text-[#B72C31]">(+0.8%)</span>
+</span>
+<span class="flex items-center gap-2">
+<b class="text-on-secondary-fixed">USD/BRL:</b>
+<span class="text-primary font-bold font-body text-[#B72C31]">R$ 5.142</span>
+<span class="text-xs text-error">(-0.2%)</span>
+</span>
+<span class="flex items-center gap-2">
+<b class="text-on-secondary-fixed">Real-time Commodity Ticker: Fortpel Industrial Ledger © 2024</b>
+</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

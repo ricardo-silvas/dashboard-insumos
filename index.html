@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="light" lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Dashboard Insumos Fortpel</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#B72C31",
+              "secondary": "#4A4A4A",
+              "background-light": "#f8f6f6",
+              "background-dark": "#1f1313",
+              "surface-container-high": "#eae8e7",
+              "surface-container": "#efeded",
+              "error": "#ba1a1a"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif", "serif"],
+              "body": ["Plus Jakarta Sans", "sans-serif"],
+              "label": ["Plus Jakarta Sans", "sans-serif"]
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-ticker-wrapper {
+            display: flex;
+            width: max-content;
+            animation: ticker-scroll 45s linear infinite;
+        }
+        .chart-grid {
+            background-image: linear-gradient(to right, rgba(225, 190, 188, 0.2) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(225, 190, 188, 0.2) 1px, transparent 1px);
+            background-size: 4rem 4rem;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(183, 44, 49, 0.3);
+            border-radius: 4px;
+        }
+        /* Fade in-out animation for transitions */
+        .fade-transition {
+            transition: opacity 0.5s ease-in-out;
+        }
+        .opacity-0 { opacity: 0; }
+        .opacity-100 { opacity: 1; }
+    </style>
+</head>
+<body class="bg-[#f8f6f6] font-body text-[#1b1c1c] flex flex-col h-screen overflow-hidden">
+
+<!-- Nav -->
+<nav class="bg-white/90 backdrop-blur-md shadow-md flex justify-between items-center w-full px-8 h-24 z-50 relative shrink-0">
+    <div class="flex items-center gap-6 justify-center flex-1">
+        <div class="bg-[#eae8e7] px-8 py-3 rounded-lg shadow-sm border border-gray-200">
+            <h1 class="text-3xl font-headline font-bold tracking-tight text-neutral-900 uppercase">
+                INDICADORES DE COMPRAS FORTPEL - COMMODITIES
+            </h1>
+        </div>
+    </div>
+    <div class="flex items-center gap-4">
+        <div class="text-right mr-4">
+            <p class="text-xs font-label uppercase tracking-widest text-secondary text-[#4A4A4A]">Próxima troca em: <span id="timer-display" class="font-bold text-[#B72C31]">20</span>s</p>
+            <p class="text-sm font-bold text-primary text-[#B72C31]">MERCADO EM TEMPO REAL</p>
+        </div>
+        <div class="h-16 w-32 bg-gray-200 rounded flex items-center justify-center text-xs font-bold text-gray-500 overflow-hidden" title="Fortpel Logo">
+             <!-- Placeholder para Logo (Mantido do original se disponível) -->
+             <img alt="Fortpel Logo" class="h-16 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/ADBb0ug_16UUxU7gz5GIyEPNuwUSiFmq_020GRsCOOIaPE-moFt-5FWWQiJ5CdXsG-wwvGr5ZvgOOARWRB7ZJWCTtQbz91yqyT6F6dCOxCw8nsZp6mO3A3kVfmfPM_J7-_L7z9t-1922YISBQyA2SHXqBhjYWpe1GvoCUPtYwLT4mdRbe5MBCkLP-5yw1X1JsBRthqzt6gnBl7bfa9F5GBAWvVaqasm07Fh_7hFJzOME6qKGeoVH2DeGB7SuHrI1HWsAd7ozfhUEPsp9PQ" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+             <span style="display:none;">FORTPEL</span>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Canvas -->
+<main class="flex-1 p-8 grid grid-cols-12 gap-8 overflow-hidden min-h-0 fade-transition opacity-100" id="main-content">
+    
+    <!-- Left Column: Performance Chart -->
+    <section class="col-span-8 flex flex-col gap-6 h-full min-h-0">
+        <header class="flex justify-between items-end">
+            <div>
+                <h2 id="indicator-title" class="text-5xl font-headline font-semibold text-[#B72C31] uppercase">CARREGANDO...</h2>
+                <p id="indicator-subtitle" class="text-[#4A4A4A] font-label mt-1 text-lg">Processamento de dados históricos...</p>
+            </div>
+            <div class="flex gap-4 items-center">
+                <div class="flex items-center gap-2 px-4 py-2 bg-[#efeded] rounded-full">
+                    <span class="w-3 h-3 bg-[#B72C31] rounded-full animate-pulse"></span>
+                    <span id="badge-top-right" class="text-sm font-bold uppercase tracking-tighter">Acumulado últimos 30 dias</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 bg-white rounded-xl shadow-lg relative chart-grid p-6 flex flex-col overflow-hidden min-h-0">
+            <!-- Data Highlight -->
+            <div class="mb-4 z-10 flex items-center justify-between">
+                <div>
+                    <div id="current-price" class="text-6xl font-headline font-bold text-[#1b1c1c] leading-none">R$ --,--</div>
+                    <div class="flex items-center gap-2 mt-2" id="current-variation-container">
+                        <span id="current-variation-icon" class="material-symbols-outlined font-bold">remove</span>
+                        <span id="current-variation" class="font-bold text-xl">--% no último mês</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Atualizado em</p>
+                    <p id="current-date" class="text-xl font-bold text-[#4A4A4A]">--/--/----</p>
+                </div>
+            </div>
+
+            <!-- Chart.js Mount Point -->
+            <div class="flex-1 w-full h-full min-h-[200px] relative pb-2 pt-4">
+                <canvas id="historicalChart"></canvas>
+            </div>
+        </div>
+    </section>
+
+    <!-- Right Column: Transactions List -->
+    <section class="col-span-4 flex flex-col gap-6 h-full min-h-0">
+        <header class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[#B72C31]">calendar_month</span>
+            <h3 class="text-2xl font-headline font-bold text-[#1b1c1c] uppercase tracking-tight">Últimos Lançamentos</h3>
+        </header>
+        
+        <div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar min-h-0" id="history-list">
+            <!-- Skeltons -->
+            <div class="p-4 bg-gray-100 animate-pulse rounded-lg h-16 w-full"></div>
+            <div class="p-4 bg-gray-100 animate-pulse rounded-lg h-16 w-full opacity-80"></div>
+            <div class="p-4 bg-gray-100 animate-pulse rounded-lg h-16 w-full opacity-60"></div>
+            <div class="p-4 bg-gray-100 animate-pulse rounded-lg h-16 w-full opacity-40"></div>
+        </div>
+    </section>
+
+</main>
+
+<!-- Footer Ticker -->
+<footer class="bg-[#1f1313] w-full h-12 flex items-center overflow-hidden whitespace-nowrap z-50 relative shrink-0">
+    <div class="bg-[#B72C31] px-6 h-full flex items-center z-10 shadow-lg border-r border-red-800">
+        <span class="text-white font-bold tracking-widest text-sm uppercase">GIRO DE MERCADO</span>
+    </div>
+    <div class="flex-1 relative overflow-hidden flex items-center">
+        <div class="animate-ticker-wrapper" id="footer-ticker">
+            <div class="flex items-center gap-12 px-8" id="ticker-content-1">
+                <span class="text-gray-400 font-bold">Iniciando feed de dados...</span>
+            </div>
+            <div class="flex items-center gap-12 px-8" id="ticker-content-2">
+                 <span class="text-gray-400 font-bold">Aguarde sincronização...</span>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
