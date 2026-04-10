@@ -302,7 +302,7 @@ function renderIndicator(ind) {
         </div>`;
     });
 
-    renderChart(data.weekly, ind);
+    renderChart(data.history, ind);
 }
 
 function setBadgeUnavailable(period) {
@@ -326,28 +326,45 @@ function updateBadge(period, variation, label) {
 // ──────────────────────────────────────────────
 //  CHART
 // ──────────────────────────────────────────────
-function renderChart(weeklyData, ind) {
+function renderChart(historyData, ind) {
     const ctx = document.getElementById('historicalChart').getContext('2d');
     if (myChart) myChart.destroy();
+
+    // Transforma para exibição cronológica nos últimos 30 dias: do mais antigo para o mais novo
+    const chartData = [...historyData].slice(0, 30).reverse();
+
+    // Mapeamento e cálculo de variação inter-diária
+    const labels = chartData.map(d => d.date.substring(0, 5)); // Exibe somente DD/MM para manter o eixo x limpo
+    const values = chartData.map(d => d.value);
+    const variations = chartData.map((item, index) => {
+        if (index === 0) return 0;
+        const prev = chartData[index - 1];
+        return ((item.value - prev.value) / prev.value) * 100;
+    });
+
+    // Escala dinâmica min: Menor valor no eixo Y começa próximo aos valores da base, valorizando a visualização das alterações (barras não ficam todas chapadas).
+    const minVal = Math.min(...values);
+    const yMinBound = Math.max(0, minVal - (minVal * 0.05)); // Corta 5% abaixo do minVal para compor a base do chart
 
     myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: weeklyData.map(w => w.label),
+            labels: labels,
             datasets: [
                 {
                     type: 'line',
-                    label: 'Variação Semanal (%)',
-                    data: weeklyData.map(w => w.variation),
+                    label: 'Variação (%)',
+                    data: variations,
                     borderColor: '#4A4A4A', backgroundColor: '#4A4A4A',
                     borderWidth: 3, tension: 0.3, yAxisID: 'y1',
-                    pointRadius: 5, pointBackgroundColor: '#fff'
+                    pointRadius: 4, pointBackgroundColor: '#fff'
                 },
                 {
                     type: 'bar',
-                    label: 'Valor Médio em R$',
-                    data: weeklyData.map(w => w.value),
-                    backgroundColor: 'rgba(183, 44, 49, 0.8)',
+                    label: 'Fechamento Diário',
+                    data: values,
+                    backgroundColor: 'rgba(183, 44, 49, 0.85)',
+                    hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
                     borderRadius: 4, yAxisID: 'y'
                 }
             ]
@@ -372,7 +389,8 @@ function renderChart(weeklyData, ind) {
                 x: { grid: { display: false } },
                 y: {
                     type: 'linear', position: 'left',
-                    title: { display: true, text: 'Valor Médio Semanal (R$)' },
+                    min: yMinBound, // Escala inteligente para destacar variação de colunas
+                    title: { display: true, text: 'Valor (R$)' },
                     ticks: {
                         callback(val) {
                             if (ind.id === 'dolar') return 'R$ ' + new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 }).format(val);
@@ -380,7 +398,7 @@ function renderChart(weeklyData, ind) {
                         }
                     }
                 },
-                y1: { type: 'linear', position: 'right', title: { display: true, text: 'Variação (%)' }, grid: { drawOnChartArea: false } }
+                y1: { type: 'linear', position: 'right', title: { display: true, text: 'Variação Diária (%)' }, grid: { drawOnChartArea: false } }
             }
         }
     });
