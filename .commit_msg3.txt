@@ -1,0 +1,1 @@
+feat: recoloca crachas de 6m e 12m exclusivamente para o indicador Dolar
