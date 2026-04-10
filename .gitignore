@@ -1,4 +1,15 @@
 node_modules/
-data/processed/*.json
-.env
+package-lock.json
 *.log
+
+# Pastas de desenvolvimento criadas na migração (não necessárias no deploy)
+public/
+excel/
+data/
+scripts/
+backend/
+
+# Arquivos temporários
+.commit_msg.txt
+test_excel.js
+scripts/inspect_excel.js

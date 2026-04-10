@@ -4,13 +4,14 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Dashboard Insumos Fortpel</title>
-    
+    <meta name="description" content="Dashboard de Indicadores de Insumos e Commodities — Fortpel. Acompanhe Café, Açúcar, Algodão, Alumínio e Dólar em tempo real."/>
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
@@ -19,32 +20,30 @@
         theme: {
           extend: {
             colors: {
-              "primary": "#B72C31",
-              "secondary": "#4A4A4A",
-              "background-light": "#f8f6f6",
-              "background-dark": "#1f1313",
-              "surface-container-high": "#eae8e7",
-              "surface-container": "#efeded",
-              "error": "#ba1a1a"
+              "primary":                 "#B72C31",
+              "secondary":               "#4A4A4A",
+              "background-light":        "#f8f6f6",
+              "background-dark":         "#1f1313",
+              "surface-container-high":  "#eae8e7",
+              "surface-container":       "#efeded",
+              "error":                   "#ba1a1a"
             },
             fontFamily: {
               "headline": ["Noto Serif", "serif"],
-              "body": ["Plus Jakarta Sans", "sans-serif"],
-              "label": ["Plus Jakarta Sans", "sans-serif"]
+              "body":     ["Plus Jakarta Sans", "sans-serif"],
+              "label":    ["Plus Jakarta Sans", "sans-serif"]
             }
           }
         }
       }
     </script>
-    
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS (Excel Parsing) -->
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
     <style>
         @keyframes ticker-scroll {
-            0% { transform: translateX(0); }
+            0%   { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
         .animate-ticker-wrapper {
@@ -53,23 +52,17 @@
             animation: ticker-scroll 45s linear infinite;
         }
         .chart-grid {
-            background-image: linear-gradient(to right, rgba(225, 190, 188, 0.2) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(225, 190, 188, 0.2) 1px, transparent 1px);
+            background-image:
+                linear-gradient(to right,  rgba(225,190,188,0.2) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(225,190,188,0.2) 1px, transparent 1px);
             background-size: 4rem 4rem;
         }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background-color: rgba(183, 44, 49, 0.3);
+            background-color: rgba(183,44,49,0.3);
             border-radius: 4px;
         }
-        /* Fade in-out animation for transitions */
-        .fade-transition {
-            transition: opacity 0.5s ease-in-out;
-        }
-        .opacity-0 { opacity: 0; }
-        .opacity-100 { opacity: 1; }
+        .fade-transition { transition: opacity 0.5s ease-in-out; }
     </style>
 </head>
 <body class="bg-[#f8f6f6] font-body text-[#1b1c1c] flex flex-col h-screen overflow-hidden">
@@ -79,24 +72,26 @@
     <div class="flex items-center gap-6 justify-center flex-1">
         <div class="bg-[#eae8e7] px-8 py-3 rounded-lg shadow-sm border border-gray-200">
             <h1 class="text-3xl font-headline font-bold tracking-tight text-neutral-900 uppercase">
-                INDICADORES DE COMPRAS FORTPEL - COMMODITIES
+                INDICADORES DE COMPRAS FORTPEL — COMMODITIES
             </h1>
         </div>
     </div>
     <div class="flex items-center gap-4">
         <div class="text-right mr-4 leading-tight">
-            <p class="text-[10px] font-label uppercase tracking-widest text-[#4A4A4A]">Terminal v4.02 | <span id="timer-display" class="font-bold text-[#B72C31]">20</span>s</p>
+            <p class="text-[10px] font-label uppercase tracking-widest text-[#4A4A4A]">
+                Terminal v5.0 | <span id="timer-display" class="font-bold text-[#B72C31]">20</span>s
+            </p>
             <p class="text-xs font-bold text-primary text-[#B72C31]">MERCADO EM TEMPO REAL</p>
         </div>
         <div class="h-16 w-48 flex items-center justify-center overflow-hidden" title="Grupo Fortpel">
-             <img alt="Grupo Fortpel Logo" class="h-16 w-auto object-contain" src="logo.png">
+            <img alt="Grupo Fortpel Logo" class="h-16 w-auto object-contain" src="logo.png">
         </div>
     </div>
 </nav>
 
 <!-- Main Canvas -->
 <main class="flex-1 p-8 grid grid-cols-12 gap-8 overflow-hidden min-h-0 fade-transition opacity-100" id="main-content">
-    
+
     <!-- Left Column: Performance Chart -->
     <section class="col-span-8 flex flex-col gap-6 h-full min-h-0">
         <header class="flex justify-between items-end">
@@ -106,23 +101,39 @@
             </div>
             <div class="flex gap-4 items-center">
                 <div class="flex flex-col gap-2 items-end">
+
+                    <!-- Seletor de Período 6M / 12M -->
+                    <div class="flex gap-1 mb-1">
+                        <button id="btn-6m"
+                            class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-tight transition-all duration-200 bg-[#B72C31] text-white"
+                            title="Ver gráfico dos últimos 6 meses">
+                            6M
+                        </button>
+                        <button id="btn-12m"
+                            class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-tight transition-all duration-200 bg-[#efeded] text-gray-600"
+                            title="Ver gráfico dos últimos 12 meses">
+                            12M
+                        </button>
+                    </div>
+
+                    <!-- Badge 30 dias -->
                     <div id="badge-container-30d" class="flex items-center gap-2 px-4 py-2 bg-[#efeded] rounded-full">
                         <span class="w-2 h-2 bg-[#B72C31] rounded-full animate-pulse"></span>
                         <span id="badge-val-30d" class="text-xs font-bold uppercase tracking-tighter text-gray-600">30 dias: ...</span>
                     </div>
+
+                    <!-- Badge 6 meses -->
                     <div id="badge-container-6m" class="flex items-center gap-2 px-4 py-2 bg-[#efeded] rounded-full">
                         <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
                         <span id="badge-val-6m" class="text-xs font-bold uppercase tracking-tighter text-gray-600">6 meses: ...</span>
                     </div>
+
+                    <!-- Badge 12 meses -->
                     <div id="badge-container-12m" class="flex items-center gap-2 px-4 py-2 bg-[#efeded] rounded-full">
                         <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
                         <span id="badge-val-12m" class="text-xs font-bold uppercase tracking-tighter text-gray-600">12 meses: ...</span>
                     </div>
-                    <div id="upload-hint" class="text-[12px] bg-red-100 border border-red-500 text-red-600 px-3 py-1 rounded-md font-bold uppercase mt-2 animate-pulse cursor-pointer hover:bg-red-200 transition-colors" title="Selecione as séries do Café (Arábica/Robusta) e do Açúcar (Cristal/Refinado)">
-                        Clique aqui p/ carregar os 4 arquivos Excel
-                    </div>
-                    <!-- Input Oculto para Fallback -->
-                    <input type="file" id="excel-upload" class="hidden" multiple accept=".xls,.xlsx">
+
                 </div>
             </div>
         </header>
@@ -134,7 +145,7 @@
                     <div id="current-price" class="text-6xl font-headline font-bold text-[#1b1c1c] leading-none">R$ --,--</div>
                     <div class="flex items-center gap-2 mt-2" id="current-variation-container">
                         <span id="current-variation-icon" class="material-symbols-outlined font-bold">remove</span>
-                        <span id="current-variation" class="font-bold text-xl">--% no último mês</span>
+                        <span id="current-variation" class="font-bold text-xl">--% no último dia</span>
                     </div>
                 </div>
                 <div class="text-right">
@@ -150,15 +161,15 @@
         </div>
     </section>
 
-    <!-- Right Column: Transactions List -->
+    <!-- Right Column: History List -->
     <section class="col-span-4 flex flex-col gap-6 h-full min-h-0">
         <header class="flex items-center gap-3">
             <span class="material-symbols-outlined text-[#B72C31]">calendar_month</span>
             <h3 class="text-2xl font-headline font-bold text-[#1b1c1c] uppercase tracking-tight">Últimos Lançamentos</h3>
         </header>
-        
+
         <div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar min-h-0" id="history-list">
-            <!-- Skeltons -->
+            <!-- Skeletons -->
             <div class="p-4 bg-gray-100 animate-pulse rounded-lg h-16 w-full"></div>
             <div class="p-4 bg-gray-100 animate-pulse rounded-lg h-16 w-full opacity-80"></div>
             <div class="p-4 bg-gray-100 animate-pulse rounded-lg h-16 w-full opacity-60"></div>
@@ -179,7 +190,7 @@
                 <span class="text-gray-400 font-bold">Iniciando feed de dados...</span>
             </div>
             <div class="flex items-center gap-12 px-8" id="ticker-content-2">
-                 <span class="text-gray-400 font-bold">Aguarde sincronização...</span>
+                <span class="text-gray-400 font-bold">Aguarde sincronização...</span>
             </div>
         </div>
     </div>

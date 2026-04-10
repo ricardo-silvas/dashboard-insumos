@@ -1,9 +1,12 @@
-chore: estrutura de pastas, package.json e script de pre-processamento Excel
+feat: dashboard limpo pronto para GitHub Pages e Smart TV LG
 
-- package.json com Express, xlsx e node-fetch
-- Pastas: excel/, data/processed/, scripts/, public/
-- Arquivos .xls movidos para excel/
-- Frontend copiado para public/
-- scripts/process_excel.js: deteccao automatica de cabecalho/colunas, datas ISO 8601, normalizacao acucar (R$/kg x50), val_6m e val_12m
-- .gitignore adicionado
-- 4 indicadores processados com sucesso
+- Removido botao de upload Excel do index.html
+- Removida dependencia SheetJS (xlsx) do index.html
+- Removidas funcoes de Excel do app.js: loadExcelData, processExcelJSON, initExcelFallback
+- Removidas funcoes de cache do localStorage (saveToCache, loadFromCache)
+- Removida chamada showUploadHint
+- server.js restaurado ao servidor estatico simples (sem Express)
+- package.json sem dependencias externas
+- .gitignore exclui node_modules e pastas de desenvolvimento
+- Dashboard 100% estatico: compativel com GitHub Pages
+- Funciona em qualquer browser incluindo LG Smart TV

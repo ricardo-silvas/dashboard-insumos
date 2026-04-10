@@ -1,17 +1,10 @@
 {
   "name": "dashboard-insumos-fortpel",
-  "version": "2.0.0",
+  "version": "4.02.0",
   "description": "Dashboard de Indicadores de Insumos e Commodities — Fortpel",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "process": "node scripts/process_excel.js",
-    "dev": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "xlsx": "^0.18.5",
-    "node-fetch": "^2.7.0"
+    "start": "node server.js"
   },
   "engines": {
     "node": ">=16.0.0"

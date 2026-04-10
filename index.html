@@ -4,13 +4,14 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Dashboard Insumos Fortpel</title>
-    
+    <meta name="description" content="Dashboard de Indicadores de Insumos e Commodities — Fortpel. Café, Açúcar, Algodão, Alumínio e Dólar em tempo real."/>
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
@@ -19,32 +20,30 @@
         theme: {
           extend: {
             colors: {
-              "primary": "#B72C31",
-              "secondary": "#4A4A4A",
-              "background-light": "#f8f6f6",
-              "background-dark": "#1f1313",
+              "primary":                "#B72C31",
+              "secondary":              "#4A4A4A",
+              "background-light":       "#f8f6f6",
+              "background-dark":        "#1f1313",
               "surface-container-high": "#eae8e7",
-              "surface-container": "#efeded",
-              "error": "#ba1a1a"
+              "surface-container":      "#efeded",
+              "error":                  "#ba1a1a"
             },
             fontFamily: {
               "headline": ["Noto Serif", "serif"],
-              "body": ["Plus Jakarta Sans", "sans-serif"],
-              "label": ["Plus Jakarta Sans", "sans-serif"]
+              "body":     ["Plus Jakarta Sans", "sans-serif"],
+              "label":    ["Plus Jakarta Sans", "sans-serif"]
             }
           }
         }
       }
     </script>
-    
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS (Excel Parsing) -->
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
     <style>
         @keyframes ticker-scroll {
-            0% { transform: translateX(0); }
+            0%   { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
         .animate-ticker-wrapper {
@@ -57,18 +56,13 @@
                               linear-gradient(to bottom, rgba(225, 190, 188, 0.2) 1px, transparent 1px);
             background-size: 4rem 4rem;
         }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background-color: rgba(183, 44, 49, 0.3);
             border-radius: 4px;
         }
-        /* Fade in-out animation for transitions */
-        .fade-transition {
-            transition: opacity 0.5s ease-in-out;
-        }
-        .opacity-0 { opacity: 0; }
+        .fade-transition { transition: opacity 0.5s ease-in-out; }
+        .opacity-0   { opacity: 0; }
         .opacity-100 { opacity: 1; }
     </style>
 </head>
@@ -89,14 +83,14 @@
             <p class="text-xs font-bold text-primary text-[#B72C31]">MERCADO EM TEMPO REAL</p>
         </div>
         <div class="h-16 w-48 flex items-center justify-center overflow-hidden" title="Grupo Fortpel">
-             <img alt="Grupo Fortpel Logo" class="h-16 w-auto object-contain" src="logo.png">
+            <img alt="Grupo Fortpel Logo" class="h-16 w-auto object-contain" src="logo.png">
         </div>
     </div>
 </nav>
 
 <!-- Main Canvas -->
 <main class="flex-1 p-8 grid grid-cols-12 gap-8 overflow-hidden min-h-0 fade-transition opacity-100" id="main-content">
-    
+
     <!-- Left Column: Performance Chart -->
     <section class="col-span-8 flex flex-col gap-6 h-full min-h-0">
         <header class="flex justify-between items-end">
@@ -118,11 +112,6 @@
                         <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
                         <span id="badge-val-12m" class="text-xs font-bold uppercase tracking-tighter text-gray-600">12 meses: ...</span>
                     </div>
-                    <div id="upload-hint" class="text-[12px] bg-red-100 border border-red-500 text-red-600 px-3 py-1 rounded-md font-bold uppercase mt-2 animate-pulse cursor-pointer hover:bg-red-200 transition-colors" title="Selecione as séries do Café (Arábica/Robusta) e do Açúcar (Cristal/Refinado)">
-                        Clique aqui p/ carregar os 4 arquivos Excel
-                    </div>
-                    <!-- Input Oculto para Fallback -->
-                    <input type="file" id="excel-upload" class="hidden" multiple accept=".xls,.xlsx">
                 </div>
             </div>
         </header>
@@ -150,15 +139,15 @@
         </div>
     </section>
 
-    <!-- Right Column: Transactions List -->
+    <!-- Right Column: History List -->
     <section class="col-span-4 flex flex-col gap-6 h-full min-h-0">
         <header class="flex items-center gap-3">
             <span class="material-symbols-outlined text-[#B72C31]">calendar_month</span>
             <h3 class="text-2xl font-headline font-bold text-[#1b1c1c] uppercase tracking-tight">Últimos Lançamentos</h3>
         </header>
-        
+
         <div class="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar min-h-0" id="history-list">
-            <!-- Skeltons -->
+            <!-- Skeletons -->
             <div class="p-4 bg-gray-100 animate-pulse rounded-lg h-16 w-full"></div>
             <div class="p-4 bg-gray-100 animate-pulse rounded-lg h-16 w-full opacity-80"></div>
             <div class="p-4 bg-gray-100 animate-pulse rounded-lg h-16 w-full opacity-60"></div>
@@ -179,7 +168,7 @@
                 <span class="text-gray-400 font-bold">Iniciando feed de dados...</span>
             </div>
             <div class="flex items-center gap-12 px-8" id="ticker-content-2">
-                 <span class="text-gray-400 font-bold">Aguarde sincronização...</span>
+                <span class="text-gray-400 font-bold">Aguarde sincronização...</span>
             </div>
         </div>
     </div>
