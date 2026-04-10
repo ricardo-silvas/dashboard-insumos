@@ -1,5 +1,5 @@
 const CORS_PROXY = "https://api.allorigins.win/get?url=";
-const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 1 hora
+const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutos
 
 const INDICATORS = [
     { id: 'algodao',        name: 'Algodão',         subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'libra-peso', url: 'https://www.cepea.org.br/br/indicador/algodao.aspx',                                              type: 'cepea' },
