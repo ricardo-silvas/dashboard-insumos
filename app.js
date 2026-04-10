@@ -243,14 +243,27 @@ function renderIndicator(ind) {
         updateBadge('30d', ((currentVal - oldest30) / oldest30) * 100, "30 dias");
     }
 
-    setBadgeUnavailable('6m');
-    setBadgeUnavailable('12m');
+    const badgeContainer6m  = document.getElementById('badge-container-6m');
+    const badgeContainer12m = document.getElementById('badge-container-12m');
 
-    if (data.val6m !== null && data.val6m !== undefined) {
-        updateBadge('6m',  ((currentVal - data.val6m)  / data.val6m)  * 100, "6 meses");
-    }
-    if (data.val12m !== null && data.val12m !== undefined) {
-        updateBadge('12m', ((currentVal - data.val12m) / data.val12m) * 100, "12 meses");
+    if (ind.id === 'dolar') {
+        if (badgeContainer6m)  badgeContainer6m.classList.remove('hidden');
+        if (badgeContainer12m) badgeContainer12m.classList.remove('hidden');
+
+        if (data.val6m !== null && data.val6m !== undefined) {
+            updateBadge('6m',  ((currentVal - data.val6m)  / data.val6m)  * 100, "6 meses");
+        } else {
+            setBadgeUnavailable('6m');
+        }
+        
+        if (data.val12m !== null && data.val12m !== undefined) {
+            updateBadge('12m', ((currentVal - data.val12m) / data.val12m) * 100, "12 meses");
+        } else {
+            setBadgeUnavailable('12m');
+        }
+    } else {
+        if (badgeContainer6m)  badgeContainer6m.classList.add('hidden');
+        if (badgeContainer12m) badgeContainer12m.classList.add('hidden');
     }
 
     // ── Variação diária ──
