@@ -64,6 +64,19 @@
         .fade-transition { transition: opacity 0.5s ease-in-out; }
         .opacity-0   { opacity: 0; }
         .opacity-100 { opacity: 1; }
+
+        @keyframes shine-gold {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        .shine-text-gold {
+            background: linear-gradient(90deg, #374151 0%, #374151 40%, #facc15 50%, #374151 60%, #374151 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine-gold 4s linear infinite;
+            display: inline-block;
+        }
     </style>
 </head>
 <body class="bg-[#f8f6f6] font-body text-[#1b1c1c] flex flex-col h-screen overflow-hidden">
@@ -80,10 +93,10 @@
     <!-- Bloco Centro: Título do Dashboard -->
     <div class="flex-1 flex justify-center items-center">
         <div class="flex flex-col items-center">
-            <h1 class="text-3xl font-headline font-medium tracking-[0.2em] text-neutral-700 uppercase">
+            <h1 class="text-3xl font-headline font-bold tracking-[0.2em] uppercase shine-text-gold">
                 INDICADORES DE COMPRAS FORTPEL
             </h1>
-            <div class="w-full h-0.5 bg-primary mt-2 opacity-50"></div>
+            <div class="w-full h-0.5 bg-primary mt-1 opacity-50"></div>
         </div>
     </div>
 
