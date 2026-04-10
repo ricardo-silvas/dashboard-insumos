@@ -70,20 +70,27 @@
 
 <!-- Nav -->
 <nav class="bg-white/90 backdrop-blur-md shadow-md flex justify-between items-center w-full px-8 h-24 z-50 relative shrink-0">
-    <div class="flex items-center gap-6 justify-center flex-1">
+    <!-- Bloco Esquerda: Logo -->
+    <div class="w-72 flex justify-start items-center">
+        <div class="h-16 w-48 flex items-center justify-start overflow-hidden" title="Grupo Fortpel">
+            <img alt="Grupo Fortpel Logo" class="h-16 w-auto object-contain" src="logo.png">
+        </div>
+    </div>
+
+    <!-- Bloco Centro: Título do Dashboard -->
+    <div class="flex-1 flex justify-center items-center">
         <div class="bg-[#eae8e7] px-8 py-3 rounded-lg shadow-sm border border-gray-200">
             <h1 class="text-3xl font-headline font-bold tracking-tight text-neutral-900 uppercase">
-                INDICADORES DE COMPRAS FORTPEL - COMMODITIES
+                INDICADORES DE COMPRAS FORTPEL
             </h1>
         </div>
     </div>
-    <div class="flex items-center gap-4">
-        <div class="text-right mr-4 leading-tight">
-            <p class="text-[10px] font-label uppercase tracking-widest text-[#4A4A4A]"><span id="timer-display" class="font-bold text-[#B72C31]">20</span>s</p>
-            <p class="text-xs font-bold text-primary text-[#B72C31]">MERCADO EM TEMPO REAL</p>
-        </div>
-        <div class="h-16 w-48 flex items-center justify-center overflow-hidden" title="Grupo Fortpel">
-            <img alt="Grupo Fortpel Logo" class="h-16 w-auto object-contain" src="logo.png">
+
+    <!-- Bloco Direita: Timer de Mercado -->
+    <div class="w-72 flex justify-end items-center">
+        <div class="text-right leading-tight">
+            <p class="text-xs font-label uppercase tracking-widest text-[#4A4A4A] mb-1"><span id="timer-display" class="font-bold text-[#B72C31] text-base">20</span>s</p>
+            <p class="text-sm font-bold text-primary text-[#B72C31]">MERCADO EM TEMPO REAL</p>
         </div>
     </div>
 </nav>
