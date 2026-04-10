@@ -393,9 +393,12 @@ function renderChart(historyData, ind) {
                     title: { display: true, text: 'Valor (R$)' },
                     ticks: {
                         callback(val) {
-                            const opts = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
-                            if (ind.id === 'dolar') { opts.minimumFractionDigits = 4; opts.maximumFractionDigits = 4; }
-                            return 'R$ ' + new Intl.NumberFormat('pt-BR', opts).format(val);
+                            return new Intl.NumberFormat('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL',
+                                minimumFractionDigits: ind.id === 'dolar' ? 4 : 2,
+                                maximumFractionDigits: ind.id === 'dolar' ? 4 : 2
+                            }).format(val);
                         }
                     }
                 },
