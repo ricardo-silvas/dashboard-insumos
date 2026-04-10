@@ -66,15 +66,15 @@
         .opacity-100 { opacity: 1; }
 
         @keyframes shine-gold {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
+            0% { background-position: 200% center; }
+            100% { background-position: -200% center; }
         }
         .shine-text-gold {
             background: linear-gradient(90deg, #374151 0%, #374151 40%, #facc15 50%, #374151 60%, #374151 100%);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shine-gold 4s linear infinite;
+            animation: shine-gold 10s linear infinite;
             display: inline-block;
         }
     </style>
