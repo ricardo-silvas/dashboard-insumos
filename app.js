@@ -117,24 +117,48 @@ async function fetchCEPEA(url, selector = null) {
 // ──────────────────────────────────────────────
 async function fetchDolar() {
     const fmt = d => `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}-${d.getFullYear()}`;
+    const fmtBR = d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
 
     try {
         const today   = new Date();
         const past13m = new Date();
         past13m.setMonth(past13m.getMonth() - 13);
 
-        const url = `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarPeriodo(dataInicial=@i,dataFinalCotacao=@f)?@i='${fmt(past13m)}'&@f='${fmt(today)}'&$top=400&$format=json&$orderby=dataHoraCotacao%20desc`;
-        const res  = await fetch(url);
-        const json = await res.json();
+        // 1. Buscar cotação em TEMPO REAL (AwesomeAPI)
+        let realTimeValue = null;
+        let realTimeDate = null;
+        try {
+            const resRT = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
+            const jsonRT = await resRT.json();
+            if (jsonRT && jsonRT.USDBRL) {
+                realTimeValue = parseFloat(jsonRT.USDBRL.bid);
+                realTimeDate = fmtBR(today);
+            }
+        } catch (e) {
+            console.warn("AwesomeAPI falhou, usando apenas BCB:", e);
+        }
 
-        if (!json.value || json.value.length === 0) throw new Error("PTAX vazio");
+        // 2. Buscar Histórico (Banco Central)
+        const urlBCB = `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarPeriodo(dataInicial=@i,dataFinalCotacao=@f)?@i='${fmt(past13m)}'&@f='${fmt(today)}'&$top=400&$format=json&$orderby=dataHoraCotacao%20desc`;
+        const resBCB  = await fetch(urlBCB);
+        const jsonBCB = await resBCB.json();
 
-        const docs = [...json.value].sort((a,b) => new Date(b.dataHoraCotacao) - new Date(a.dataHoraCotacao));
+        if (!jsonBCB.value || jsonBCB.value.length === 0) throw new Error("PTAX vazio");
 
-        const history = docs.map(d => {
+        let history = jsonBCB.value.map(d => {
             const p = d.dataHoraCotacao.split(' ')[0].split('-');
             return { date: `${p[2]}/${p[1]}/${p[0]}`, value: d.cotacaoVenda };
         });
+
+        // 3. Mesclar tempo real no topo do histórico se for uma data nova
+        if (realTimeValue && history.length > 0) {
+            if (history[0].date !== realTimeDate) {
+                history.unshift({ date: realTimeDate, value: realTimeValue });
+            } else {
+                // Se já existe a data de hoje (PTAX saiu), atualizamos com o valor mais preciso do mercado se o PTAX estiver defasado
+                history[0].value = realTimeValue;
+            }
+        }
 
         const target6m  = new Date(); target6m.setMonth(target6m.getMonth() - 6);
         const target12m = new Date(); target12m.setMonth(target12m.getMonth() - 12);
@@ -155,7 +179,7 @@ async function fetchDolar() {
         };
 
     } catch (e) {
-        console.error("BCB API Error:", e);
+        console.error("Dolar Ingestion Error:", e);
         return null;
     }
 }
