@@ -489,8 +489,8 @@ document.addEventListener('DOMContentLoaded', () => {
     run();
 });
 
-// Recarregar a página a cada 15 minutos para evitar que a Smart TV desligue a tela
+// Recarregar a página a cada 9 minutos para evitar que a Smart TV desligue a tela
 setInterval(() => {
     window.location.reload();
-}, 15 * 60 * 1000);
+}, 9 * 60 * 1000);
 
