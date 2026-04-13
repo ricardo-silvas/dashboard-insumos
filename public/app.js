@@ -377,3 +377,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setPeriod('6m'); // default
     run();
 });
+
+// Recarregar a página a cada 15 minutos para evitar que a Smart TV desligue a tela
+setInterval(() => {
+    window.location.reload();
+}, 15 * 60 * 1000);
+
