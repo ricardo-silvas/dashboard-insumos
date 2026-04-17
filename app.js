@@ -303,12 +303,16 @@ function renderIndicator(ind) {
     document.getElementById('indicator-subtitle').innerText = ind.subtitle;
     document.getElementById('current-date').innerText       = data.current.date;
 
-    const fmtOpts = { style: 'currency', currency: 'BRL' };
+    let fmtOpts = { style: 'currency', currency: 'BRL' };
     if (ind.id === 'dolar') { fmtOpts.minimumFractionDigits = 4; fmtOpts.maximumFractionDigits = 4; }
+    if (ind.id === 'brent') { fmtOpts.currency = 'USD'; }
+    if (ind.unit === 'índice') {
+        fmtOpts = { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 };
+    }
     const formatter = new Intl.NumberFormat('pt-BR', fmtOpts);
     const priceText = formatter.format(data.current.value);
 
-    document.getElementById('current-price').innerHTML = ind.unit
+    document.getElementById('current-price').innerHTML = ind.unit && ind.unit !== 'índice'
         ? `${priceText} <span class="text-3xl font-body text-gray-500 font-medium tracking-normal ml-1">/ ${ind.unit}</span>`
         : priceText;
 
@@ -419,9 +423,9 @@ function renderChart(historyData, ind) {
         return ((item.value - prev.value) / prev.value) * 100;
     });
 
-    // Escala dinâmica min: Menor valor no eixo Y começa próximo aos valores da base, valorizando a visualização das alterações (barras não ficam todas chapadas).
+    // Escala dinâmica min: Menor valor no eixo Y começa próximo aos valores da base
     const minVal = Math.min(...values);
-    const yMinBound = Math.max(0, minVal - (minVal * 0.05)); // Corta 5% abaixo do minVal para compor a base do chart
+    const yMinBound = Math.max(0, minVal - (minVal * 0.25)); // 25% de margem inferior para a barra mínima não cortar a label vertical
 
     Chart.register(ChartDataLabels);
     
