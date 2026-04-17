@@ -1,14 +1,25 @@
 const CORS_PROXY = "https://api.allorigins.win/get?url=";
 const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutos
 
+const API_KEYS = {
+    EIA: 'YkaEQiJbpLQ6kthsI9xZYaPMbAHk2lzkAhFTHt8m',
+    FRED: '129364fab26ca1e02cedf9a7bddc600d'
+};
+
 const INDICATORS = [
-    { id: 'algodao',        name: 'Algodão',         subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'libra-peso', url: 'https://www.cepea.org.br/br/indicador/algodao.aspx',                                              type: 'cepea' },
+    { id: 'dolar',          name: 'Dólar Comercial', subtitle: 'Banco Central do Brasil / PTAX',          unit: '',           type: 'dolar' },
+    { id: 'algodao',        name: 'Algodão',         subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'libra-peso', url: 'https://www.cepea.org.br/br/indicador/algodao.aspx',                                              type: 'cepea', selector: '#imagenet-indicador1' },
+    { id: 'etanol',         name: 'Etanol',          subtitle: 'Semanal Hidratado - SP CEPEA',           unit: 'litro',      url: 'https://www.cepea.org.br/br/indicador/etanol.aspx',                                               type: 'cepea', selector: '#imagenet-indicador3' },
+    { id: 'brent',          name: 'Petróleo Brent',  subtitle: 'EIA.gov',                                unit: 'barril',     type: 'eia_brent' },
+    { id: 'ps',             name: 'Poliestireno (PS)',subtitle: 'Índice de Preços FRED (USA)',           unit: 'índice',     type: 'fred', series_id: 'PCU326140326140' },
+    { id: 'pp',             name: 'Polipropileno (PP)',subtitle:'Índice de Preços FRED (USA)',           unit: 'índice',     type: 'fred', series_id: 'PCU325211325211' },
+    { id: 'celulose_curta', name: 'Celulose Curta',  subtitle: 'WPU0911 FRED (USA)',                     unit: 'índice',     type: 'fred', series_id: 'WPU0911' },
+    { id: 'celulose_longa', name: 'Celulose Longa',  subtitle: 'WPU09 FRED (USA)',                       unit: 'índice',     type: 'fred', series_id: 'WPU09' },
     { id: 'cafe_arabica',   name: 'Café Arábica',    subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'sc 60kg',    url: 'https://www.cepea.org.br/br/indicador/cafe.aspx',                                                 type: 'cepea', selector: '#imagenet-indicador1' },
     { id: 'cafe_robusta',   name: 'Café Robusta',    subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'sc 60kg',    url: 'https://www.cepea.org.br/br/indicador/cafe.aspx',                                                 type: 'cepea', selector: '#imagenet-indicador2' },
     { id: 'acucar_cristal', name: 'Açúcar Cristal',  subtitle: 'Empacotado SP - CEPEA/ESALQ',            unit: 'sc 50kg',    url: 'https://www.cepea.org.br/br/indicador/acucar-cristal-empacotado-cepea-esalq-sao-paulo.aspx',       type: 'cepea' },
     { id: 'acucar_ref',     name: 'Açúcar Refinado', subtitle: 'Amorfo SP - CEPEA/ESALQ',                unit: 'sc 50kg',    url: 'https://www.cepea.org.br/br/indicador/acucar-refinado-amorfo-sp.aspx',                             type: 'cepea' },
-    { id: 'aluminio',       name: 'Alumínio (LME)',  subtitle: 'London Metal Exchange (Dados Estimados)', unit: 'tonelada',   type: 'mock' },
-    { id: 'dolar',          name: 'Dólar Comercial', subtitle: 'Banco Central do Brasil / PTAX',          unit: '',           type: 'dolar' }
+    { id: 'aluminio',       name: 'Alumínio (LME)',  subtitle: 'London Metal Exchange (Dados Estimados)', unit: 'tonelada',   type: 'mock' }
 ];
 
 let currentIndex = 0;
@@ -51,6 +62,10 @@ async function fetchAllData() {
                     val12m  = dolarResult.val12m;
                 }
 
+            } else if (ind.type === 'eia_brent') {
+                history = await fetchEIA();
+            } else if (ind.type === 'fred') {
+                history = await fetchFRED(ind.series_id);
             } else if (ind.type === 'mock') {
                 history = generateFallbackData(ind.id);
             }
@@ -185,12 +200,50 @@ async function fetchDolar() {
 }
 
 // ──────────────────────────────────────────────
+//  EIA & FRED APIs
+// ──────────────────────────────────────────────
+async function fetchEIA() {
+    const url = `https://api.eia.gov/v2/petroleum/pri/spt/data/?api_key=${API_KEYS.EIA}&frequency=daily&data[0]=value&facets[series][]=RBRTE&sort[0][column]=period&sort[0][direction]=desc&length=60`;
+    try {
+        const res = await fetch(url);
+        const json = await res.json();
+        let dataArr = json.response && json.response.data ? json.response.data : [];
+        let history = dataArr.map(d => {
+            const [y, m, day] = d.period.split('-');
+            return { date: `${day}/${m}/${y}`, value: parseFloat(d.value) };
+        }).filter(d => !isNaN(d.value));
+        return history.slice(0, 30);
+    } catch(e) {
+        console.error("EIA Ingestion Error:", e);
+        throw e;
+    }
+}
+
+async function fetchFRED(seriesId) {
+    const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${API_KEYS.FRED}&file_type=json&sort_order=desc&limit=60`;
+    try {
+        const res = await fetch(url);
+        const json = await res.json();
+        let obs = json.observations || [];
+        let history = obs.map(d => {
+            const [y, m, day] = d.date.split('-');
+            return { date: `${day}/${m}/${y}`, value: parseFloat(d.value) };
+        }).filter(d => !isNaN(d.value));
+        return history.slice(0, 30);
+    } catch(e) {
+        console.error("FRED Ingestion Error:", e);
+        throw e;
+    }
+}
+
+// ──────────────────────────────────────────────
 //  FALLBACK / MOCK (Alumínio e erros)
 // ──────────────────────────────────────────────
 function generateFallbackData(metricId) {
     const basePrices = {
         algodao: 415.50, cafe_arabica: 1250.00, cafe_robusta: 937.00,
-        acucar_cristal: 145.80, acucar_ref: 160.20, aluminio: 13450.00, dolar: 5.20
+        acucar_cristal: 145.80, acucar_ref: 160.20, aluminio: 13450.00, dolar: 5.20,
+        etanol: 2.45
     };
     let basePrice = basePrices[metricId] || 100;
     let currVal   = basePrice;
@@ -370,26 +423,55 @@ function renderChart(historyData, ind) {
     const minVal = Math.min(...values);
     const yMinBound = Math.max(0, minVal - (minVal * 0.05)); // Corta 5% abaixo do minVal para compor a base do chart
 
+    Chart.register(ChartDataLabels);
+    
+    // Define the prefix logic for different commodities
+    let prefix = '';
+    if (ind.unit !== 'índice') {
+        prefix = ind.id === 'brent' ? 'US$' : 'R$';
+    }
+    const seriesLabel = ind.id === 'dolar' ? `R$ Dólar do dia` : `${prefix} ${ind.name} do dia`;
+
     myChart = new Chart(ctx, {
         type: 'bar',
+        plugins: [ChartDataLabels],
         data: {
             labels: labels,
             datasets: [
                 {
                     type: 'line',
-                    label: 'Variação (%)',
+                    label: '% Variação do dia',
                     data: variations,
                     borderColor: '#4A4A4A', backgroundColor: '#4A4A4A',
                     borderWidth: 3, tension: 0.3, yAxisID: 'y1',
-                    pointRadius: 4, pointBackgroundColor: '#fff'
+                    pointRadius: 4, pointBackgroundColor: '#fff',
+                    datalabels: {
+                        anchor: 'center', align: 'top', offset: 4,
+                        rotation: -90,
+                        color: '#ffffff',
+                        backgroundColor: '#4A4A4A',
+                        borderRadius: 4,
+                        padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                        font: { weight: 'bold', size: 10 },
+                        formatter: (val) => val.toFixed(2) + '%'
+                    }
                 },
                 {
                     type: 'bar',
-                    label: 'Fechamento Diário',
+                    label: seriesLabel,
                     data: values,
                     backgroundColor: 'rgba(183, 44, 49, 0.85)',
                     hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
-                    borderRadius: 4, yAxisID: 'y'
+                    borderRadius: 4, yAxisID: 'y',
+                    datalabels: {
+                        anchor: 'end', align: 'start', offset: 4,
+                        rotation: -90,
+                        color: '#ffffff', font: { weight: 'bold', size: 11 },
+                        formatter: (val) => {
+                            const pFix = ind.id === 'brent' ? 'US$' : 'R$';
+                            return ind.unit === 'índice' ? val.toFixed(2) : `${pFix} ${val.toFixed(2)}`;
+                        }
+                    }
                 }
             ]
         },
