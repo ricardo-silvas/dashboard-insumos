@@ -454,7 +454,7 @@ function renderChart(historyData, ind) {
                     borderWidth: 3, tension: 0.3, yAxisID: 'y1',
                     pointRadius: 4, pointBackgroundColor: '#fff',
                     datalabels: {
-                        anchor: 'center', align: 'top', offset: 4,
+                        anchor: 'end', align: 'end', offset: 8,
                         rotation: -90,
                         color: '#ffffff',
                         backgroundColor: '#4A4A4A',
@@ -472,12 +472,11 @@ function renderChart(historyData, ind) {
                     hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
                     borderRadius: 4, yAxisID: 'y',
                     datalabels: {
-                        anchor: 'end', align: 'start', offset: 4,
+                        anchor: 'start', align: 'end', offset: 12,
                         rotation: -90,
                         color: '#ffffff', font: { weight: 'bold', size: 11 },
                         formatter: (val) => {
-                            const pFix = ind.id === 'brent' ? 'US$' : 'R$';
-                            return ind.unit === 'índice' ? val.toFixed(2) : `${pFix} ${val.toFixed(2)}`;
+                            return ind.unit === 'índice' ? val.toFixed(2) : `${prefix} ${val.toFixed(2)}`;
                         }
                     }
                 }
@@ -504,15 +503,14 @@ function renderChart(historyData, ind) {
                 y: {
                     type: 'linear', position: 'left',
                     min: yMinBound, // Escala inteligente para destacar variação de colunas
-                    title: { display: true, text: 'Valor (R$)' },
+                    title: { display: true, text: `Valor (${prefix})` },
                     ticks: {
                         callback(val) {
-                            return new Intl.NumberFormat('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL',
-                                minimumFractionDigits: ind.id === 'dolar' ? 4 : 2,
-                                maximumFractionDigits: ind.id === 'dolar' ? 4 : 2
-                            }).format(val);
+                            let currOpts = { style: 'currency', currency: ind.currency || 'BRL' };
+                            if (ind.unit === 'índice' && !ind.currency) {
+                                currOpts = { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 };
+                            }
+                            return new Intl.NumberFormat('pt-BR', currOpts).format(val);
                         }
                     }
                 },
@@ -530,8 +528,11 @@ function updateFooterTicker() {
     INDICATORS.forEach(ind => {
         const d = globalData[ind.id];
         if (!d) return;
-        const opts = { style: 'currency', currency: 'BRL' };
+        let opts = { style: 'currency', currency: ind.currency || 'BRL' };
         if (ind.id === 'dolar') { opts.minimumFractionDigits = 4; opts.maximumFractionDigits = 4; }
+        if (ind.unit === 'índice' && !ind.currency) {
+            opts = { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 };
+        }
         const val  = new Intl.NumberFormat('pt-BR', opts).format(d.current.value);
         const varT = d.current.variation;
         const icon = varT > 0 ? 'arrow_upward' : (varT < 0 ? 'arrow_downward' : 'remove');
