@@ -421,10 +421,11 @@ function renderChart(historyData, ind) {
         const prev = chartData[index - 1];
         return ((item.value - prev.value) / prev.value) * 100;
     });
-    // yMinBound: 98% do valor mínimo — barras altas, sem espaço desperdicado embaixo
+    // yMinBound: 90% do mínimo (padrão Bloomberg/TradingView)
+    // Garante barras com 60-75% da altura do gráfico — visualmente proporcionais
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
-    const yMinBound = Math.max(0, minVal * 0.98);
+    const yMinBound = Math.max(0, minVal * 0.90);
 
     Chart.register(ChartDataLabels);
     
@@ -451,10 +452,10 @@ function renderChart(historyData, ind) {
                     borderWidth: 3, tension: 0.3, yAxisID: 'y1',
                     pointRadius: 4, pointBackgroundColor: '#fff',
                     datalabels: {
-                        anchor: 'end', align: 'end', offset: 4,
-                        rotation: -90,
-                        color: '#000000',
-                        font: { family: 'sans-serif', weight: 'bold', size: 11 },
+                        // % acima do ponto da linha, leve e discreto
+                        anchor: 'end', align: 'top', offset: 2,
+                        color: '#333333',
+                        font: { weight: 'bold', size: 10 },
                         formatter: (val) => val.toFixed(2) + '%'
                     }
                 },
@@ -466,9 +467,10 @@ function renderChart(historyData, ind) {
                     hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
                     borderRadius: 4, yAxisID: 'y',
                     datalabels: {
-                        anchor: 'start', align: 'end', offset: 4,
+                        // Valor do preço no topo da barra (dentro), sem rotação
+                        anchor: 'end', align: 'start', offset: 4,
                         rotation: -90,
-                        color: '#ffffff', font: { weight: 'bold', size: 11 },
+                        color: '#ffffff', font: { weight: 'bold', size: 10 },
                         formatter: (val) => {
                             return ind.unit === 'índice' ? val.toFixed(2) : `${prefix} ${val.toFixed(2)}`;
                         }
