@@ -469,9 +469,8 @@ function renderChart(historyData, ind) {
                     hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
                     borderRadius: 4, yAxisID: 'y',
                     datalabels: {
-                        anchor: 'start', align: 'end', offset: 6,
+                        anchor: 'end', align: 'start', offset: 8,
                         rotation: -90,
-                        clamp: false,
                         color: '#ffffff', font: { weight: 'bold', size: 11 },
                         formatter: (val) => {
                             return ind.unit === 'índice' ? val.toFixed(2) : `${prefix} ${val.toFixed(2)}`;
@@ -481,8 +480,8 @@ function renderChart(historyData, ind) {
             ]
         },
         options: {
-            clip: false,
             responsive: true, maintainAspectRatio: false,
+            layout: { padding: { top: 30 } },
             interaction: { mode: 'index', intersect: false },
             plugins: {
                 legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 12 } } },
