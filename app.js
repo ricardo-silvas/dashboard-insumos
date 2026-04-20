@@ -10,16 +10,16 @@ const INDICATORS = [
     { id: 'dolar',          name: 'Dólar Comercial', subtitle: 'Banco Central do Brasil / PTAX',          unit: '',           type: 'dolar' },
     { id: 'algodao',        name: 'Algodão',         subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'libra-peso', url: 'https://www.cepea.org.br/br/indicador/algodao.aspx',                                              type: 'cepea', selector: '#imagenet-indicador1' },
     { id: 'etanol',         name: 'Etanol',          subtitle: 'Semanal Hidratado - SP CEPEA',           unit: 'litro',      url: 'https://www.cepea.org.br/br/indicador/etanol.aspx',                                               type: 'cepea', selector: '#imagenet-indicador3' },
-    { id: 'brent',          name: 'Petróleo Brent',  subtitle: 'EIA.gov',                                unit: 'barril',     type: 'eia_brent' },
-    { id: 'ps',             name: 'Poliestireno (PS)',subtitle: 'Índice de Preços FRED (USA)',           unit: 'índice',     type: 'fred', series_id: 'PCU326140326140' },
-    { id: 'pp',             name: 'Polipropileno (PP)',subtitle:'Índice de Preços FRED (USA)',           unit: 'índice',     type: 'fred', series_id: 'PCU325211325211' },
-    { id: 'celulose_curta', name: 'Celulose Curta',  subtitle: 'WPU0911 FRED (USA)',                     unit: 'índice',     type: 'fred', series_id: 'WPU0911' },
-    { id: 'celulose_longa', name: 'Celulose Longa',  subtitle: 'WPU09 FRED (USA)',                       unit: 'índice',     type: 'fred', series_id: 'WPU09' },
+    { id: 'brent',          name: 'Petróleo Brent',  subtitle: 'EIA.gov',                                unit: 'barril',     currency: 'USD', type: 'eia_brent' },
+    { id: 'ps',             name: 'Poliestireno (PS)',subtitle: 'Índice de Preços FRED (USA)',           unit: 'índice',     currency: 'USD', type: 'fred', series_id: 'PCU326140326140' },
+    { id: 'pp',             name: 'Polipropileno (PP)',subtitle:'Índice de Preços FRED (USA)',           unit: 'índice',     currency: 'USD', type: 'fred', series_id: 'PCU325211325211' },
+    { id: 'celulose_curta', name: 'Celulose Curta',  subtitle: 'WPU0911 FRED (USA)',                     unit: 'tonelada',   currency: 'USD', type: 'fred', series_id: 'WPU0911' },
+    { id: 'celulose_longa', name: 'Celulose Longa',  subtitle: 'WPU09 FRED (USA)',                       unit: 'tonelada',   currency: 'USD', type: 'fred', series_id: 'WPU09' },
     { id: 'cafe_arabica',   name: 'Café Arábica',    subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'sc 60kg',    url: 'https://www.cepea.org.br/br/indicador/cafe.aspx',                                                 type: 'cepea', selector: '#imagenet-indicador1' },
     { id: 'cafe_robusta',   name: 'Café Robusta',    subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'sc 60kg',    url: 'https://www.cepea.org.br/br/indicador/cafe.aspx',                                                 type: 'cepea', selector: '#imagenet-indicador2' },
     { id: 'acucar_cristal', name: 'Açúcar Cristal',  subtitle: 'Empacotado SP - CEPEA/ESALQ',            unit: 'sc 50kg',    url: 'https://www.cepea.org.br/br/indicador/acucar-cristal-empacotado-cepea-esalq-sao-paulo.aspx',       type: 'cepea' },
     { id: 'acucar_ref',     name: 'Açúcar Refinado', subtitle: 'Amorfo SP - CEPEA/ESALQ',                unit: 'sc 50kg',    url: 'https://www.cepea.org.br/br/indicador/acucar-refinado-amorfo-sp.aspx',                             type: 'cepea' },
-    { id: 'aluminio',       name: 'Alumínio (LME)',  subtitle: 'London Metal Exchange (Dados Estimados)', unit: 'tonelada',   type: 'mock' }
+    { id: 'aluminio',       name: 'Alumínio (LME)',  subtitle: 'London Metal Exchange (Dados Estimados)', unit: 'tonelada',   currency: 'USD', type: 'mock' }
 ];
 
 let currentIndex = 0;
@@ -303,17 +303,16 @@ function renderIndicator(ind) {
     document.getElementById('indicator-subtitle').innerText = ind.subtitle;
     document.getElementById('current-date').innerText       = data.current.date;
 
-    let fmtOpts = { style: 'currency', currency: 'BRL' };
+    let fmtOpts = { style: 'currency', currency: ind.currency || 'BRL' };
     if (ind.id === 'dolar') { fmtOpts.minimumFractionDigits = 4; fmtOpts.maximumFractionDigits = 4; }
-    if (ind.id === 'brent') { fmtOpts.currency = 'USD'; }
-    if (ind.unit === 'índice') {
+    if (ind.unit === 'índice' && !ind.currency) {
         fmtOpts = { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 };
     }
     const formatter = new Intl.NumberFormat('pt-BR', fmtOpts);
     const priceText = formatter.format(data.current.value);
 
-    document.getElementById('current-price').innerHTML = ind.unit && ind.unit !== 'índice'
-        ? `${priceText} <span class="text-3xl font-body text-gray-500 font-medium tracking-normal ml-1">/ ${ind.unit}</span>`
+    document.getElementById('current-price').innerHTML = (ind.unit && ind.unit !== 'índice') || (ind.unit === 'índice' && ind.currency)
+        ? `${priceText} <span class="text-3xl font-body text-gray-500 font-medium tracking-normal ml-1">/ ${ind.unit || ''}</span>`
         : priceText;
 
     // ── Badges ──
@@ -423,16 +422,21 @@ function renderChart(historyData, ind) {
         return ((item.value - prev.value) / prev.value) * 100;
     });
 
-    // Escala dinâmica min: Menor valor no eixo Y começa próximo aos valores da base
+    // Escala dinâmica min: Menor valor no eixo Y começa com uma folga enorme (metade)
+    // Isso garante que a primeira barra ou colunas de menor valor sejam fisicamente gigantes
+    // o suficiente para não cortar o label de R$ ou US$
     const minVal = Math.min(...values);
-    const yMinBound = Math.max(0, minVal - (minVal * 0.25)); // 25% de margem inferior para a barra mínima não cortar a label vertical
+    const maxVal = Math.max(...values);
+    const yMinBound = Math.max(0, minVal - ((maxVal - minVal) * 1.2) - (minVal * 0.4));
 
     Chart.register(ChartDataLabels);
     
     // Define the prefix logic for different commodities
     let prefix = '';
-    if (ind.unit !== 'índice') {
-        prefix = ind.id === 'brent' ? 'US$' : 'R$';
+    if (ind.currency === 'USD') {
+        prefix = 'US$';
+    } else if (ind.currency === 'BRL' || (!ind.currency && ind.unit !== 'índice')) {
+        prefix = 'R$';
     }
     const seriesLabel = ind.id === 'dolar' ? `R$ Dólar do dia` : `${prefix} ${ind.name} do dia`;
 
