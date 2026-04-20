@@ -432,9 +432,6 @@ function renderChart(historyData, ind) {
     // garantindo que as barras tenham sempre um tamanho base visível considerável
     const yMinBound = Math.max(0, minVal * 0.85);
 
-    // Configura o teto do eixo Y garantindo espaço interno para a barra mais alta
-    const yMaxBound = maxVal === minVal ? maxVal * 1.05 : maxVal + (range * 0.15);
-
     // Define the prefix logic for different commodities
     let prefix = '';
     if (ind.currency === 'USD') {
@@ -498,7 +495,7 @@ function renderChart(historyData, ind) {
             ]
         },
         options: {
-            layout: { padding: { top: 80 } },
+            layout: { padding: { top: 35 } },
             responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
@@ -519,7 +516,6 @@ function renderChart(historyData, ind) {
                 y: {
                     type: 'linear', position: 'left',
                     min: yMinBound, 
-                    max: yMaxBound, // Teto superior calculado dinamicamente
                     grace: '15%',
                     title: { display: true, text: 'Valor (R$)' },
                     ticks: {
