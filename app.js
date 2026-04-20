@@ -461,13 +461,7 @@ function renderChart(historyData, ind) {
                     borderWidth: 2, tension: 0.5, yAxisID: 'y1',
                     pointRadius: 3, pointBackgroundColor: '#fff',
                     datalabels: {
-                        anchor: 'center', align: 'top', offset: 12,
-                        rotation: -90,
-                        color: '#1b1c1c',
-                        backgroundColor: 'transparent',
-                        padding: 0,
-                        font: { weight: 'bold', size: 10 },
-                        formatter: (val) => val.toFixed(2) + '%'
+                        display: false
                     }
                 },
                 {
@@ -478,14 +472,23 @@ function renderChart(historyData, ind) {
                     hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
                     borderRadius: 4, yAxisID: 'y',
                     datalabels: {
-                        display: true,
-                        anchor: 'start', align: 'end', offset: 4,
-                        clamp: true, clip: false,
-                        rotation: -90,
-                        color: '#ffffff', font: { weight: 'bold', size: 11 },
-                        formatter: (val) => {
-                            const pFix = ind.id === 'brent' ? 'US$' : 'R$';
-                            return ind.unit === 'índice' ? val.toFixed(2) : `${pFix} ${val.toFixed(2)}`;
+                        labels: {
+                            base: {
+                                display: true,
+                                anchor: 'start', align: 'end', offset: 4,
+                                clamp: true, clip: false,
+                                rotation: -90,
+                                color: '#ffffff', font: { weight: 'bold', size: 11 },
+                                formatter: (val) => val.toFixed(2)
+                            },
+                            variation: {
+                                display: true,
+                                anchor: 'end', align: 'end', offset: 4,
+                                clip: false,
+                                rotation: -90,
+                                color: '#1b1c1c', font: { weight: 'bold', size: 10 },
+                                formatter: (val, ctx) => variations[ctx.dataIndex].toFixed(2) + '%'
+                            }
                         }
                     }
                 }
