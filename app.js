@@ -479,7 +479,7 @@ function renderChart(historyData, ind) {
                     borderRadius: 4, yAxisID: 'y',
                     datalabels: {
                         display: true,
-                        anchor: 'start', align: 'end', offset: 8,
+                        anchor: 'start', align: 'end', offset: 4,
                         clamp: true, clip: false,
                         rotation: -90,
                         color: '#ffffff', font: { weight: 'bold', size: 11 },
