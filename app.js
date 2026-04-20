@@ -474,7 +474,9 @@ function renderChart(historyData, ind) {
                     hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
                     borderRadius: 4, yAxisID: 'y',
                     datalabels: {
-                        anchor: 'start', align: 'top', offset: 15,
+                        display: true,
+                        anchor: 'start', align: 'end', offset: 8,
+                        clamp: true, clip: false,
                         rotation: -90,
                         color: '#ffffff', font: { weight: 'bold', size: 11 },
                         formatter: (val) => {
