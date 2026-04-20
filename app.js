@@ -422,12 +422,11 @@ function renderChart(historyData, ind) {
         return ((item.value - prev.value) / prev.value) * 100;
     });
 
-    // Escala dinâmica min: Menor valor no eixo Y começa com uma folga enorme (metade)
-    // Isso garante que a primeira barra ou colunas de menor valor sejam fisicamente gigantes
-    // o suficiente para não cortar o label de R$ ou US$
+    // Escala dinâmica: margem inferior de 30% do range para manter barras altas e legíveis
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
-    const yMinBound = Math.max(0, minVal - ((maxVal - minVal) * 1.2) - (minVal * 0.4));
+    const range = maxVal - minVal;
+    const yMinBound = Math.max(0, minVal - (range * 0.3));
 
     Chart.register(ChartDataLabels);
     
