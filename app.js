@@ -495,7 +495,7 @@ function renderChart(historyData, ind) {
             ]
         },
         options: {
-            layout: { padding: { top: 20 } },
+            layout: { padding: { top: 45 } },
             responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
@@ -516,6 +516,7 @@ function renderChart(historyData, ind) {
                 y: {
                     type: 'linear', position: 'left',
                     min: yMinBound, // Escala inteligente para destacar variação de colunas
+                    grace: '15%', // Impede que a barra mais alta encoste no teto, cortando a legenda %
                     title: { display: true, text: 'Valor (R$)' },
                     ticks: {
                         callback(val) {
