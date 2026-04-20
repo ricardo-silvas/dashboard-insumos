@@ -426,7 +426,11 @@ function renderChart(historyData, ind) {
     // Isso maximiza a altura da barra e faz o gráfico usar todo o espaço livre
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
-    const yMinBound = Math.max(0, minVal * 0.995);
+    const range = maxVal - minVal;
+    
+    // Calcula o piso para que a menor barra nunca encoste no "chão" (cerca de 40% da amplitude extra)
+    const yMinPad = range === 0 ? minVal * 0.1 : range * 0.4;
+    const yMinBound = Math.max(0, minVal - yMinPad);
 
     // Define the prefix logic for different commodities
     let prefix = '';
@@ -488,6 +492,7 @@ function renderChart(historyData, ind) {
             ]
         },
         options: {
+            layout: { padding: { top: 20 } },
             responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
@@ -520,7 +525,12 @@ function renderChart(historyData, ind) {
                         }
                     }
                 },
-                y1: { type: 'linear', position: 'right', title: { display: true, text: 'Variação Diária (%)' }, grid: { drawOnChartArea: false } }
+                y1: { 
+                    type: 'linear', position: 'right', 
+                    title: { display: true, text: 'Variação Diária (%)' }, 
+                    grid: { drawOnChartArea: false },
+                    grace: '15%' // Adiciona respiro/espaço extra no limite do eixo para rótulos altos
+                }
             }
         }
     });
