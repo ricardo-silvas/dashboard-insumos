@@ -139,26 +139,26 @@
                     </div>
                 </div>
 
-                <!-- Legenda Customizada (Centralizada perfeitamente no espaço em branco) -->
-                <div class="absolute left-1/2 -translate-x-1/2 top-1/2 translate-y-2 flex items-center gap-5">
-                    <div class="flex items-center gap-2">
-                        <span class="w-8 h-3.5 bg-[#4A4A4A] rounded-sm"></span>
-                        <span class="text-base font-bold text-gray-500">% Variação do dia</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="w-8 h-3.5 bg-[#B72C31] rounded-sm flex items-center justify-center"></span>
-                        <span id="custom-legend-bar-label" class="text-base font-bold text-gray-500">Valor do dia</span>
-                    </div>
-                </div>
-
                 <div class="text-right">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Atualizado em</p>
                     <p id="current-date" class="text-xl font-bold text-[#4A4A4A]">--/--/----</p>
                 </div>
             </div>
 
+            <!-- Legenda Customizada (Movida para logo acima do teto do gráfico) -->
+            <div class="flex items-center justify-center gap-5 w-full pb-0 z-10 relative">
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-3.5 bg-[#4A4A4A] rounded-sm"></span>
+                    <span class="text-base font-bold text-gray-500">% Variação do dia</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-8 h-3.5 bg-[#B72C31] rounded-sm flex items-center justify-center"></span>
+                    <span id="custom-legend-bar-label" class="text-base font-bold text-gray-500">Valor do dia</span>
+                </div>
+            </div>
+
             <!-- Chart.js Mount Point -->
-            <div class="flex-1 w-full h-full min-h-[200px] relative pb-2 pt-4">
+            <div class="flex-1 w-full h-full min-h-[200px] relative pb-2 pt-0">
                 <canvas id="historicalChart"></canvas>
             </div>
         </div>
