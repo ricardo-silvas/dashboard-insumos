@@ -421,12 +421,10 @@ function renderChart(historyData, ind) {
         const prev = chartData[index - 1];
         return ((item.value - prev.value) / prev.value) * 100;
     });
-
-    // Escala dinâmica: margem inferior de 30% do range para manter barras altas e legíveis
+    // yMinBound: 98% do valor mínimo — barras altas, sem espaço desperdicado embaixo
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
-    const range = maxVal - minVal;
-    const yMinBound = Math.max(0, minVal - (range * 0.3));
+    const yMinBound = Math.max(0, minVal * 0.98);
 
     Chart.register(ChartDataLabels);
     
@@ -468,7 +466,7 @@ function renderChart(historyData, ind) {
                     hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
                     borderRadius: 4, yAxisID: 'y',
                     datalabels: {
-                        anchor: 'end', align: 'start', offset: 8,
+                        anchor: 'start', align: 'end', offset: 4,
                         rotation: -90,
                         color: '#ffffff', font: { weight: 'bold', size: 11 },
                         formatter: (val) => {
