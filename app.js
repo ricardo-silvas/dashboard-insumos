@@ -1,5 +1,5 @@
 const CORS_PROXY = "https://api.allorigins.win/get?url=";
-const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutos
+const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 60 minutos
 
 const API_KEYS = {
     EIA: 'YkaEQiJbpLQ6kthsI9xZYaPMbAHk2lzkAhFTHt8m',
@@ -580,8 +580,8 @@ document.addEventListener('DOMContentLoaded', () => {
     run();
 });
 
-// Recarregar a página a cada 9 minutos para evitar que a Smart TV desligue a tela
+// Recarregar a página a cada 60 minutos para atualização global
 setInterval(() => {
     window.location.reload();
-}, 9 * 60 * 1000);
+}, 60 * 60 * 1000);
 
