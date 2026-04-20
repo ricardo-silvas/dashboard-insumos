@@ -454,7 +454,7 @@ function renderChart(historyData, ind) {
                     borderWidth: 3, tension: 0.3, yAxisID: 'y1',
                     pointRadius: 4, pointBackgroundColor: '#fff',
                     datalabels: {
-                        anchor: 'end', align: 'end', offset: 8,
+                        anchor: 'center', align: 'top', offset: 25,
                         rotation: -90,
                         color: '#ffffff',
                         backgroundColor: '#4A4A4A',
@@ -472,7 +472,7 @@ function renderChart(historyData, ind) {
                     hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
                     borderRadius: 4, yAxisID: 'y',
                     datalabels: {
-                        anchor: 'start', align: 'top', offset: 12,
+                        anchor: 'start', align: 'top', offset: 50,
                         rotation: -90,
                         color: '#ffffff', font: { weight: 'bold', size: 11 },
                         formatter: (val) => {
