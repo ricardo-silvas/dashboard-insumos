@@ -437,6 +437,20 @@ function renderChart(historyData, ind) {
     }
     const seriesLabel = ind.id === 'dolar' ? `R$ Dólar do dia` : `${prefix} ${ind.name} do dia`;
 
+    // Cores das barras por direção da variação (verde = alta, vermelho = baixa)
+    const barColors = values.map((_, i) => {
+        if (i === 0) return 'rgba(183,44,49,0.85)';
+        return variations[i] >= 0 ? 'rgba(22,163,74,0.85)' : 'rgba(183,44,49,0.85)';
+    });
+    const barHover = values.map((_, i) => {
+        if (i === 0) return 'rgba(183,44,49,1)';
+        return variations[i] >= 0 ? 'rgba(22,163,74,1)' : 'rgba(183,44,49,1)';
+    });
+
+    // Label inteligente: exibe 1 a cada N pontos para evitar sobreposição
+    const n = labels.length;
+    const step = n <= 20 ? 1 : n <= 40 ? 2 : 3;
+
     myChart = new Chart(ctx, {
         type: 'bar',
         plugins: [ChartDataLabels],
@@ -447,14 +461,14 @@ function renderChart(historyData, ind) {
                     type: 'line',
                     label: '% Variação do dia',
                     data: variations,
-                    borderColor: '#4A4A4A', backgroundColor: '#4A4A4A',
-                    borderWidth: 3, tension: 0.3, yAxisID: 'y1',
-                    pointRadius: 4, pointBackgroundColor: '#fff',
+                    borderColor: '#4A4A4A', backgroundColor: 'transparent',
+                    borderWidth: 2, tension: 0.3, yAxisID: 'y1',
+                    pointRadius: 3, pointBackgroundColor: variations.map(v => v >= 0 ? '#16a34a' : '#B72C31'),
                     datalabels: {
-                        // % acima do ponto da linha, leve e discreto
+                        display: (ctx) => ctx.dataIndex % step === 0,
                         anchor: 'end', align: 'top', offset: 2,
-                        color: '#333333',
-                        font: { weight: 'bold', size: 10 },
+                        color: (ctx) => variations[ctx.dataIndex] >= 0 ? '#15803d' : '#B72C31',
+                        font: { weight: 'bold', size: 9 },
                         formatter: (val) => val.toFixed(2) + '%'
                     }
                 },
@@ -462,26 +476,28 @@ function renderChart(historyData, ind) {
                     type: 'bar',
                     label: seriesLabel,
                     data: values,
-                    backgroundColor: 'rgba(183, 44, 49, 0.85)',
-                    hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
-                    borderRadius: 4, yAxisID: 'y',
+                    backgroundColor: barColors,
+                    hoverBackgroundColor: barHover,
+                    borderRadius: 3, yAxisID: 'y',
                     datalabels: {
-                        // Valor do preço no topo da barra (dentro), sem rotação
+                        display: (ctx) => ctx.dataIndex % step === 0,
                         anchor: 'end', align: 'start', offset: 4,
                         rotation: -90,
-                        color: '#ffffff', font: { weight: 'bold', size: 10 },
-                        formatter: (val) => {
-                            return ind.unit === 'índice' ? val.toFixed(2) : `${prefix} ${val.toFixed(2)}`;
-                        }
+                        color: '#ffffff', font: { weight: 'bold', size: 9 },
+                        formatter: (val) => ind.unit === 'índice' ? val.toFixed(2) : `${prefix} ${val.toFixed(2)}`
                     }
                 }
             ]
         },
+
         options: {
             responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-                legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 12 } } },
+                legend: {
+                    position: 'bottom',
+                    labels: { font: { family: 'Plus Jakarta Sans', size: 11 }, boxWidth: 14, padding: 10 }
+                },
                 tooltip: {
                     callbacks: {
                         label(context) {
