@@ -422,15 +422,12 @@ function renderChart(historyData, ind) {
         return ((item.value - prev.value) / prev.value) * 100;
     });
 
-    // Escala dinâmica min: Menor valor no eixo Y começa com uma folga enorme (metade)
-    // Isso garante que a primeira barra ou colunas de menor valor sejam fisicamente gigantes
-    // o suficiente para não cortar o label de R$ ou US$
+    // Escala dinâmica min: Ajustada para colar próximo ao valor mínimo (99.5%)
+    // Isso maximiza a altura da barra e faz o gráfico usar todo o espaço livre
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
-    const yMinBound = Math.max(0, minVal - ((maxVal - minVal) * 1.2) - (minVal * 0.4));
+    const yMinBound = Math.max(0, minVal * 0.995);
 
-    Chart.register(ChartDataLabels);
-    
     // Define the prefix logic for different commodities
     let prefix = '';
     if (ind.currency === 'USD') {
@@ -439,6 +436,12 @@ function renderChart(historyData, ind) {
         prefix = 'R$';
     }
     const seriesLabel = ind.id === 'dolar' ? `R$ Dólar do dia` : `${prefix} ${ind.name} do dia`;
+
+    // Atualiza a Legenda Customizada do HTML
+    const legendLabelHtml = document.getElementById('custom-legend-bar-label');
+    if (legendLabelHtml) legendLabelHtml.innerText = seriesLabel;
+
+    Chart.register(ChartDataLabels);
 
     myChart = new Chart(ctx, {
         type: 'bar',
@@ -487,7 +490,7 @@ function renderChart(historyData, ind) {
             responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-                legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 12 } } },
+                legend: { display: false },
                 tooltip: {
                     callbacks: {
                         label(context) {
