@@ -1,5 +1,5 @@
 const CORS_PROXY = "https://api.allorigins.win/get?url=";
-const REFRESH_INTERVAL_MS = 60 * 60 * 1000; // 60 minutos
+const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutos
 
 const API_KEYS = {
     EIA: 'YkaEQiJbpLQ6kthsI9xZYaPMbAHk2lzkAhFTHt8m',
@@ -421,10 +421,13 @@ function renderChart(historyData, ind) {
         const prev = chartData[index - 1];
         return ((item.value - prev.value) / prev.value) * 100;
     });
-    // yMinBound mínimo possível: barras preenchem toda a área do gráfico
+
+    // Escala dinâmica min: Menor valor no eixo Y começa com uma folga enorme (metade)
+    // Isso garante que a primeira barra ou colunas de menor valor sejam fisicamente gigantes
+    // o suficiente para não cortar o label de R$ ou US$
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
-    const yMinBound = Math.max(0, minVal * 0.995);
+    const yMinBound = Math.max(0, minVal - ((maxVal - minVal) * 1.2) - (minVal * 0.4));
 
     Chart.register(ChartDataLabels);
     
@@ -437,20 +440,6 @@ function renderChart(historyData, ind) {
     }
     const seriesLabel = ind.id === 'dolar' ? `R$ Dólar do dia` : `${prefix} ${ind.name} do dia`;
 
-    // Cores das barras por direção da variação (verde = alta, vermelho = baixa)
-    const barColors = values.map((_, i) => {
-        if (i === 0) return 'rgba(183,44,49,0.85)';
-        return variations[i] >= 0 ? 'rgba(22,163,74,0.85)' : 'rgba(183,44,49,0.85)';
-    });
-    const barHover = values.map((_, i) => {
-        if (i === 0) return 'rgba(183,44,49,1)';
-        return variations[i] >= 0 ? 'rgba(22,163,74,1)' : 'rgba(183,44,49,1)';
-    });
-
-    // Label inteligente: exibe 1 a cada N pontos para evitar sobreposição
-    const n = labels.length;
-    const step = n <= 20 ? 1 : n <= 40 ? 2 : 3;
-
     myChart = new Chart(ctx, {
         type: 'bar',
         plugins: [ChartDataLabels],
@@ -461,14 +450,17 @@ function renderChart(historyData, ind) {
                     type: 'line',
                     label: '% Variação do dia',
                     data: variations,
-                    borderColor: '#4A4A4A', backgroundColor: 'transparent',
-                    borderWidth: 2, tension: 0.3, yAxisID: 'y1',
-                    pointRadius: 3, pointBackgroundColor: variations.map(v => v >= 0 ? '#16a34a' : '#B72C31'),
+                    borderColor: '#4A4A4A', backgroundColor: '#4A4A4A',
+                    borderWidth: 3, tension: 0.3, yAxisID: 'y1',
+                    pointRadius: 4, pointBackgroundColor: '#fff',
                     datalabels: {
-                        display: (ctx) => ctx.dataIndex % step === 0,
-                        anchor: 'end', align: 'top', offset: 2,
-                        color: (ctx) => variations[ctx.dataIndex] >= 0 ? '#15803d' : '#B72C31',
-                        font: { weight: 'bold', size: 9 },
+                        anchor: 'center', align: 'top', offset: 4,
+                        rotation: -90,
+                        color: '#ffffff',
+                        backgroundColor: '#4A4A4A',
+                        borderRadius: 4,
+                        padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                        font: { weight: 'bold', size: 10 },
                         formatter: (val) => val.toFixed(2) + '%'
                     }
                 },
@@ -476,28 +468,26 @@ function renderChart(historyData, ind) {
                     type: 'bar',
                     label: seriesLabel,
                     data: values,
-                    backgroundColor: barColors,
-                    hoverBackgroundColor: barHover,
-                    borderRadius: 3, yAxisID: 'y',
+                    backgroundColor: 'rgba(183, 44, 49, 0.85)',
+                    hoverBackgroundColor: 'rgba(183, 44, 49, 1)',
+                    borderRadius: 4, yAxisID: 'y',
                     datalabels: {
-                        display: (ctx) => ctx.dataIndex % step === 0,
                         anchor: 'end', align: 'start', offset: 4,
                         rotation: -90,
-                        color: '#ffffff', font: { weight: 'bold', size: 9 },
-                        formatter: (val) => ind.unit === 'índice' ? val.toFixed(2) : `${prefix} ${val.toFixed(2)}`
+                        color: '#ffffff', font: { weight: 'bold', size: 11 },
+                        formatter: (val) => {
+                            const pFix = ind.id === 'brent' ? 'US$' : 'R$';
+                            return ind.unit === 'índice' ? val.toFixed(2) : `${pFix} ${val.toFixed(2)}`;
+                        }
                     }
                 }
             ]
         },
-
         options: {
             responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { font: { family: 'Plus Jakarta Sans', size: 11 }, boxWidth: 14, padding: 10 }
-                },
+                legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 12 } } },
                 tooltip: {
                     callbacks: {
                         label(context) {
@@ -514,14 +504,15 @@ function renderChart(historyData, ind) {
                 y: {
                     type: 'linear', position: 'left',
                     min: yMinBound, // Escala inteligente para destacar variação de colunas
-                    title: { display: true, text: `Valor (${prefix})` },
+                    title: { display: true, text: 'Valor (R$)' },
                     ticks: {
                         callback(val) {
-                            let currOpts = { style: 'currency', currency: ind.currency || 'BRL' };
-                            if (ind.unit === 'índice' && !ind.currency) {
-                                currOpts = { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 };
-                            }
-                            return new Intl.NumberFormat('pt-BR', currOpts).format(val);
+                            return new Intl.NumberFormat('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL',
+                                minimumFractionDigits: ind.id === 'dolar' ? 4 : 2,
+                                maximumFractionDigits: ind.id === 'dolar' ? 4 : 2
+                            }).format(val);
                         }
                     }
                 },
@@ -539,11 +530,8 @@ function updateFooterTicker() {
     INDICATORS.forEach(ind => {
         const d = globalData[ind.id];
         if (!d) return;
-        let opts = { style: 'currency', currency: ind.currency || 'BRL' };
+        const opts = { style: 'currency', currency: 'BRL' };
         if (ind.id === 'dolar') { opts.minimumFractionDigits = 4; opts.maximumFractionDigits = 4; }
-        if (ind.unit === 'índice' && !ind.currency) {
-            opts = { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 };
-        }
         const val  = new Intl.NumberFormat('pt-BR', opts).format(d.current.value);
         const varT = d.current.variation;
         const icon = varT > 0 ? 'arrow_upward' : (varT < 0 ? 'arrow_downward' : 'remove');
@@ -591,8 +579,8 @@ document.addEventListener('DOMContentLoaded', () => {
     run();
 });
 
-// Recarregar a página a cada 60 minutos para atualização global
+// Recarregar a página a cada 9 minutos para evitar que a Smart TV desligue a tela
 setInterval(() => {
     window.location.reload();
-}, 60 * 60 * 1000);
+}, 9 * 60 * 1000);
 
