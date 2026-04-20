@@ -421,11 +421,10 @@ function renderChart(historyData, ind) {
         const prev = chartData[index - 1];
         return ((item.value - prev.value) / prev.value) * 100;
     });
-    // yMinBound: 90% do mínimo (padrão Bloomberg/TradingView)
-    // Garante barras com 60-75% da altura do gráfico — visualmente proporcionais
+    // yMinBound mínimo possível: barras preenchem toda a área do gráfico
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
-    const yMinBound = Math.max(0, minVal * 0.90);
+    const yMinBound = Math.max(0, minVal * 0.995);
 
     Chart.register(ChartDataLabels);
     
@@ -480,7 +479,6 @@ function renderChart(historyData, ind) {
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            layout: { padding: { top: 30 } },
             interaction: { mode: 'index', intersect: false },
             plugins: {
                 legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 12 } } },
