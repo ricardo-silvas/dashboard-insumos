@@ -131,9 +131,23 @@
             <div class="mb-4 z-10 flex items-center justify-between">
                 <div>
                     <div id="current-price" class="text-6xl font-headline font-bold text-[#1b1c1c] leading-none">R$ --,--</div>
-                    <div class="flex items-center gap-2 mt-2" id="current-variation-container">
-                        <span id="current-variation-icon" class="material-symbols-outlined font-bold">remove</span>
-                        <span id="current-variation" class="font-bold text-xl">--% no último mês</span>
+                    <div class="flex items-center gap-6 mt-3">
+                        <div class="flex items-center gap-2" id="current-variation-container">
+                            <span id="current-variation-icon" class="material-symbols-outlined font-bold text-2xl">remove</span>
+                            <span id="current-variation" class="font-bold text-2xl">--% vs Dia Anterior</span>
+                        </div>
+                        
+                        <!-- Legenda Customizada (Substitui a legenda padrão do gráfico) -->
+                        <div class="flex items-center gap-5 pl-6 border-l-2 border-gray-200">
+                            <div class="flex items-center gap-2">
+                                <span class="w-8 h-3.5 bg-[#4A4A4A] rounded-sm"></span>
+                                <span class="text-base font-bold text-gray-500">% Variação do dia</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-8 h-3.5 bg-[#B72C31] rounded-sm flex items-center justify-center"></span>
+                                <span id="custom-legend-bar-label" class="text-base font-bold text-gray-500">Valor do dia</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="text-right">
