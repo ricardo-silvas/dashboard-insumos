@@ -454,8 +454,8 @@ function renderChart(historyData, ind) {
                     label: '% Variação do dia',
                     data: variations,
                     borderColor: '#4A4A4A', backgroundColor: '#4A4A4A',
-                    borderWidth: 3, tension: 0.5, yAxisID: 'y1',
-                    pointRadius: 4, pointBackgroundColor: '#fff',
+                    borderWidth: 2, tension: 0.5, yAxisID: 'y1',
+                    pointRadius: 3, pointBackgroundColor: '#fff',
                     datalabels: {
                         anchor: 'center', align: 'top', offset: 4,
                         rotation: -90,
