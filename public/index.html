@@ -90,10 +90,10 @@
 </nav>
 
 <!-- Main Canvas -->
-<main class="flex-1 p-8 grid grid-cols-12 gap-8 overflow-hidden min-h-0 fade-transition opacity-100" id="main-content">
+<main class="flex-1 px-8 pt-4 pb-2 grid grid-cols-12 gap-6 overflow-hidden min-h-0 fade-transition opacity-100" id="main-content">
 
     <!-- Left Column: Performance Chart -->
-    <section class="col-span-8 flex flex-col gap-6 h-full min-h-0">
+    <section class="col-span-8 flex flex-col gap-3 h-full min-h-0">
         <header class="flex justify-between items-end">
             <div>
                 <h2 id="indicator-title" class="text-5xl font-headline font-semibold text-[#B72C31] uppercase">CARREGANDO...</h2>
@@ -140,17 +140,17 @@
 
         <div class="flex-1 bg-white rounded-xl shadow-lg relative chart-grid p-6 flex flex-col overflow-hidden min-h-0">
             <!-- Data Highlight -->
-            <div class="mb-4 z-10 flex items-center justify-between">
+            <div class="mb-2 z-10 flex items-center justify-between">
                 <div>
-                    <div id="current-price" class="text-6xl font-headline font-bold text-[#1b1c1c] leading-none">R$ --,--</div>
-                    <div class="flex items-center gap-2 mt-2" id="current-variation-container">
+                    <div id="current-price" class="text-5xl font-headline font-bold text-[#1b1c1c] leading-none">R$ --,--</div>
+                    <div class="flex items-center gap-2 mt-1" id="current-variation-container">
                         <span id="current-variation-icon" class="material-symbols-outlined font-bold">remove</span>
-                        <span id="current-variation" class="font-bold text-xl">--% no último dia</span>
+                        <span id="current-variation" class="font-bold text-base">--% no último dia</span>
                     </div>
                 </div>
                 <div class="text-right">
                     <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Atualizado em</p>
-                    <p id="current-date" class="text-xl font-bold text-[#4A4A4A]">--/--/----</p>
+                    <p id="current-date" class="text-lg font-bold text-[#4A4A4A]">--/--/----</p>
                 </div>
             </div>
 
