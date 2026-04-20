@@ -19,7 +19,7 @@ const INDICATORS = [
     { id: 'cafe_robusta',   name: 'Café Robusta',    subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'sc 60kg',    url: 'https://www.cepea.org.br/br/indicador/cafe.aspx',                                                 type: 'cepea', selector: '#imagenet-indicador2' },
     { id: 'acucar_cristal', name: 'Açúcar Cristal',  subtitle: 'Empacotado SP - CEPEA/ESALQ',            unit: 'sc 50kg',    url: 'https://www.cepea.org.br/br/indicador/acucar-cristal-empacotado-cepea-esalq-sao-paulo.aspx',       type: 'cepea' },
     { id: 'acucar_ref',     name: 'Açúcar Refinado', subtitle: 'Amorfo SP - CEPEA/ESALQ',                unit: 'sc 50kg',    url: 'https://www.cepea.org.br/br/indicador/acucar-refinado-amorfo-sp.aspx',                             type: 'cepea' },
-    { id: 'aluminio',       name: 'Alumínio (LME)',  subtitle: 'London Metal Exchange (Dados Estimados)', unit: 'tonelada',   currency: 'USD', type: 'mock' }
+    { id: 'aluminio',       name: 'Alumínio (LME)',  subtitle: 'London Metal Exchange (Dados Estimados)', unit: 'tonelada',   currency: 'BRL', type: 'mock' }
 ];
 
 let currentIndex = 0;
@@ -428,9 +428,9 @@ function renderChart(historyData, ind) {
     const maxVal = Math.max(...values);
     const range = maxVal - minVal;
     
-    // Calcula o piso para que a menor barra nunca encoste no "chão" (cerca de 40% da amplitude extra)
-    const yMinPad = range === 0 ? minVal * 0.1 : range * 0.4;
-    const yMinBound = Math.max(0, minVal - yMinPad);
+    // Configura o piso do eixo Y (Base da barra) para 85% do menor valor, 
+    // garantindo que as barras tenham sempre um tamanho base visível considerável
+    const yMinBound = Math.max(0, minVal * 0.85);
 
     // Define the prefix logic for different commodities
     let prefix = '';
