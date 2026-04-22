@@ -23,6 +23,31 @@ const INDICATORS = [
 ];
 
 let currentIndex = 0;
+
+/**
+ * Retorna um formatador Intl.NumberFormat baseado nas regras do indicador.
+ * Centraliza a "regra" para evitar divergências entre telas e componentes.
+ */
+function getFormatter(ind, forceDecimal = false) {
+    let opts = { style: forceDecimal ? 'decimal' : 'currency', currency: ind.currency || 'BRL' };
+    
+    // Regra específica para o Dólar (4 casas)
+    if (ind.id === 'dolar') {
+        opts.minimumFractionDigits = 4;
+        opts.maximumFractionDigits = 4;
+    } else {
+        opts.minimumFractionDigits = 2;
+        opts.maximumFractionDigits = 2;
+    }
+
+    // Regra para índices sem moeda (exiba apenas como decimal)
+    if (ind.unit === 'índice' && !ind.currency) {
+        opts.style = 'decimal';
+    }
+
+    return new Intl.NumberFormat('pt-BR', opts);
+}
+
 // globalData stores per-indicator: { history, weekly, current, val6m, val12m }
 let globalData = {};
 let myChart = null;
@@ -303,14 +328,9 @@ function renderIndicator(ind) {
     document.getElementById('indicator-subtitle').innerText = ind.subtitle;
     document.getElementById('current-date').innerText       = data.current.date;
 
-    let fmtOpts = { style: 'currency', currency: ind.currency || 'BRL' };
-    if (ind.id === 'dolar') { fmtOpts.minimumFractionDigits = 4; fmtOpts.maximumFractionDigits = 4; }
-    if (ind.unit === 'índice' && !ind.currency) {
-        fmtOpts = { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 };
-    }
-    const formatter = new Intl.NumberFormat('pt-BR', fmtOpts);
+    const formatter = getFormatter(ind);
     const priceText = formatter.format(data.current.value);
-
+    
     document.getElementById('current-price').innerHTML = (ind.unit && ind.unit !== 'índice') || (ind.unit === 'índice' && ind.currency)
         ? `${priceText} <span class="text-3xl font-body text-gray-500 font-medium tracking-normal ml-1">/ ${ind.unit || ''}</span>`
         : priceText;
@@ -479,7 +499,7 @@ function renderChart(historyData, ind) {
                                 clamp: true, clip: false,
                                 rotation: -90,
                                 color: '#ffffff', font: { weight: 'bold', size: 11 },
-                                formatter: (val) => val.toFixed(2)
+                                formatter: (val) => getFormatter(ind, true).format(val)
                             },
                             variation: {
                                 display: true,
@@ -548,12 +568,8 @@ function updateFooterTicker() {
     INDICATORS.forEach(ind => {
         const d = globalData[ind.id];
         if (!d) return;
-        let opts = { style: 'currency', currency: ind.currency || 'BRL' };
-        if (ind.id === 'dolar') { opts.minimumFractionDigits = 4; opts.maximumFractionDigits = 4; }
-        if (ind.unit === 'índice' && !ind.currency) {
-            opts = { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 };
-        }
-        const val  = new Intl.NumberFormat('pt-BR', opts).format(d.current.value);
+        const formatter = getFormatter(ind);
+        const val  = formatter.format(d.current.value);
         const varT = d.current.variation;
         const icon = varT > 0 ? 'arrow_upward' : (varT < 0 ? 'arrow_downward' : 'remove');
         const col  = varT > 0 ? 'text-green-400' : (varT < 0 ? 'text-red-400' : 'text-gray-400');
