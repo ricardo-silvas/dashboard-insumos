@@ -524,9 +524,7 @@ function renderChart(historyData, ind) {
                     callbacks: {
                         label(context) {
                             if (context.dataset.type === 'line') return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + '%';
-                            const opts = { style: 'currency', currency: 'BRL' };
-                            if (ind.id === 'dolar') { opts.minimumFractionDigits = 4; opts.maximumFractionDigits = 4; }
-                            return context.dataset.label + ': ' + new Intl.NumberFormat('pt-BR', opts).format(context.parsed.y);
+                            return context.dataset.label + ': ' + getFormatter(ind).format(context.parsed.y);
                         }
                     }
                 }
@@ -537,15 +535,10 @@ function renderChart(historyData, ind) {
                     type: 'linear', position: 'left',
                     min: yMinBound, 
                     grace: '15%',
-                    title: { display: true, text: 'Valor (R$)' },
+                    title: { display: true, text: `Valor (${prefix.trim()})` },
                     ticks: {
                         callback(val) {
-                            return new Intl.NumberFormat('pt-BR', {
-                                style: 'currency',
-                                currency: 'BRL',
-                                minimumFractionDigits: ind.id === 'dolar' ? 4 : 2,
-                                maximumFractionDigits: ind.id === 'dolar' ? 4 : 2
-                            }).format(val);
+                            return getFormatter(ind).format(val);
                         }
                     }
                 },
