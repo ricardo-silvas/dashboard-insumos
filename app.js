@@ -548,8 +548,11 @@ function updateFooterTicker() {
     INDICATORS.forEach(ind => {
         const d = globalData[ind.id];
         if (!d) return;
-        const opts = { style: 'currency', currency: 'BRL' };
+        let opts = { style: 'currency', currency: ind.currency || 'BRL' };
         if (ind.id === 'dolar') { opts.minimumFractionDigits = 4; opts.maximumFractionDigits = 4; }
+        if (ind.unit === 'índice' && !ind.currency) {
+            opts = { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 };
+        }
         const val  = new Intl.NumberFormat('pt-BR', opts).format(d.current.value);
         const varT = d.current.variation;
         const icon = varT > 0 ? 'arrow_upward' : (varT < 0 ? 'arrow_downward' : 'remove');
