@@ -229,7 +229,7 @@ async function fetchDolar() {
 // ──────────────────────────────────────────────
 async function fetchYahooBrent() {
     const symbol = 'BZ=F'; // Brent Crude Oil Futures
-    const url = `${CORS_PROXY}${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=60d`)}`;
+    const url = `${CORS_PROXY}${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=60d&_=${Date.now()}`)}`;
     try {
         const res = await fetch(url);
         const json = await res.json();
