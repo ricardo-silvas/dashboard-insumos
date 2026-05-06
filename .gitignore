@@ -13,3 +13,4 @@ backend/
 .commit_msg.txt
 test_excel.js
 scripts/inspect_excel.js
+scratch/

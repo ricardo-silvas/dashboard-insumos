@@ -10,7 +10,7 @@ const INDICATORS = [
     { id: 'dolar',          name: 'Dólar Comercial', subtitle: 'Banco Central do Brasil / PTAX',          unit: '',           type: 'dolar' },
     { id: 'algodao',        name: 'Algodão',         subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'libra-peso', url: 'https://www.cepea.org.br/br/indicador/algodao.aspx',                                              type: 'cepea', selector: '#imagenet-indicador1' },
     { id: 'etanol',         name: 'Etanol',          subtitle: 'Semanal Hidratado - SP CEPEA',           unit: 'litro',      url: 'https://www.cepea.org.br/br/indicador/etanol.aspx',                                               type: 'cepea', selector: '#imagenet-indicador3' },
-    { id: 'brent',          name: 'Petróleo Brent',  subtitle: 'EIA.gov',                                unit: 'barril',     currency: 'USD', type: 'eia_brent' },
+    { id: 'brent',          name: 'Petróleo Brent',  subtitle: 'Yahoo Finance',                          unit: 'barril',     currency: 'USD', type: 'yahoo_brent' },
     { id: 'ps',             name: 'Poliestireno (PS)',subtitle: 'Índice de Preços FRED (USA)',           unit: 'índice',     currency: 'USD', type: 'fred', series_id: 'PCU326140326140' },
     { id: 'pp',             name: 'Polipropileno (PP)',subtitle:'Índice de Preços FRED (USA)',           unit: 'índice',     currency: 'USD', type: 'fred', series_id: 'PCU325211325211' },
     { id: 'celulose_curta', name: 'Celulose Curta',  subtitle: 'WPU0911 FRED (USA)',                     unit: 'tonelada',   currency: 'USD', type: 'fred', series_id: 'WPU0911' },
@@ -87,8 +87,8 @@ async function fetchAllData() {
                     val12m  = dolarResult.val12m;
                 }
 
-            } else if (ind.type === 'eia_brent') {
-                history = await fetchEIA();
+            } else if (ind.type === 'yahoo_brent') {
+                history = await fetchYahooBrent();
             } else if (ind.type === 'fred') {
                 history = await fetchFRED(ind.series_id);
             } else if (ind.type === 'mock') {
@@ -225,21 +225,31 @@ async function fetchDolar() {
 }
 
 // ──────────────────────────────────────────────
-//  EIA & FRED APIs
+//  YAHOO & FRED APIs
 // ──────────────────────────────────────────────
-async function fetchEIA() {
-    const url = `https://api.eia.gov/v2/petroleum/pri/spt/data/?api_key=${API_KEYS.EIA}&frequency=daily&data[0]=value&facets[series][]=RBRTE&sort[0][column]=period&sort[0][direction]=desc&length=60`;
+async function fetchYahooBrent() {
+    const symbol = 'BZ=F'; // Brent Crude Oil Futures
+    const url = `${CORS_PROXY}${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=60d`)}`;
     try {
         const res = await fetch(url);
         const json = await res.json();
-        let dataArr = json.response && json.response.data ? json.response.data : [];
-        let history = dataArr.map(d => {
-            const [y, m, day] = d.period.split('-');
-            return { date: `${day}/${m}/${y}`, value: parseFloat(d.value) };
-        }).filter(d => !isNaN(d.value));
+        const content = JSON.parse(json.contents);
+        if (!content.chart || !content.chart.result) throw new Error("Yahoo Data Error");
+        
+        const result = content.chart.result[0];
+        const timestamps = result.timestamp;
+        const prices = result.indicators.quote[0].close;
+        
+        let history = [];
+        for (let i = timestamps.length - 1; i >= 0; i--) {
+            if (prices[i] === null || prices[i] === undefined) continue;
+            const date = new Date(timestamps[i] * 1000);
+            const dateStr = `${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}/${date.getFullYear()}`;
+            history.push({ date: dateStr, value: parseFloat(prices[i]) });
+        }
         return history.slice(0, 30);
     } catch(e) {
-        console.error("EIA Ingestion Error:", e);
+        console.error("Yahoo Brent Ingestion Error:", e);
         throw e;
     }
 }
