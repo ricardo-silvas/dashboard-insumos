@@ -23,6 +23,7 @@ const INDICATORS = [
 ];
 
 let currentIndex = 0;
+let isPaused = false;
 
 /**
  * Retorna um formatador Intl.NumberFormat baseado nas regras do indicador.
@@ -595,6 +596,8 @@ function updateFooterTicker() {
 // ──────────────────────────────────────────────
 function startRotation() {
     setInterval(() => {
+        if (isPaused) return; // Se pausado, não faz nada
+        
         const timer = document.getElementById('timer-display');
         let countdown = parseInt(timer.innerText) - 1;
         if (countdown <= 0) {
@@ -613,9 +616,49 @@ function startRotation() {
 }
 
 // ──────────────────────────────────────────────
+//  NAVIGATION CONTROLS
+// ──────────────────────────────────────────────
+function nextIndicator() {
+    currentIndex = (currentIndex + 1) % INDICATORS.length;
+    renderCurrent();
+}
+
+function prevIndicator() {
+    currentIndex = (currentIndex - 1 + INDICATORS.length) % INDICATORS.length;
+    renderCurrent();
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+    const btn = document.getElementById('btn-pause');
+    btn.innerText = isPaused ? 'play_arrow' : 'pause';
+    // Dar um feedback visual na cor
+    if (isPaused) {
+        btn.style.color = '#22c55e'; // Verde para Play
+    } else {
+        btn.style.color = '#B72C31'; // Vermelho para Pausa
+    }
+}
+
+function renderCurrent() {
+    // Reseta o timer ao mudar manualmente
+    document.getElementById('timer-display').innerText = '20';
+    document.getElementById('main-content').style.opacity = '0';
+    setTimeout(() => {
+        renderIndicator(INDICATORS[currentIndex]);
+        document.getElementById('main-content').style.opacity = '1';
+    }, 300);
+}
+
+// ──────────────────────────────────────────────
 //  BOOT
 // ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    // Configurar botões de navegação
+    document.getElementById('btn-prev')?.addEventListener('click', prevIndicator);
+    document.getElementById('btn-next')?.addEventListener('click', nextIndicator);
+    document.getElementById('btn-pause')?.addEventListener('click', togglePause);
+    
     run();
 });
 

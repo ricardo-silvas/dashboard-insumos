@@ -107,6 +107,14 @@
                 <h2 id="indicator-title" class="text-5xl font-headline font-semibold text-[#B72C31] uppercase">CARREGANDO...</h2>
                 <p id="indicator-subtitle" class="text-[#4A4A4A] font-label mt-1 text-lg">Processamento de dados históricos...</p>
             </div>
+
+            <!-- Controles de Navegação -->
+            <div class="flex items-center gap-8 bg-white/40 backdrop-blur-md px-8 py-4 rounded-3xl shadow-sm border border-gray-100 mb-2">
+                <button id="btn-prev" class="material-symbols-outlined text-5xl text-gray-400 hover:text-primary active:scale-90 transition-all cursor-pointer select-none" title="Anterior">arrow_back</button>
+                <button id="btn-pause" class="material-symbols-outlined text-7xl text-primary hover:scale-110 active:scale-95 transition-all cursor-pointer select-none" title="Pausar/Play">pause</button>
+                <button id="btn-next" class="material-symbols-outlined text-5xl text-gray-400 hover:text-primary active:scale-90 transition-all cursor-pointer select-none" title="Próximo">arrow_forward</button>
+            </div>
+
             <div class="flex gap-4 items-center">
                 <div class="flex flex-col gap-2 items-end">
                     <div id="badge-container-30d" class="flex items-center gap-2 px-4 py-2 bg-[#efeded] rounded-full">
