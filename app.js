@@ -299,15 +299,20 @@ function generateFallbackData(metricId) {
     let ptr       = new Date();
     let history   = [];
 
+    let isMonthly = metricId === 'ps' || metricId === 'pp' || metricId.startsWith('celulose');
     for (let i = 0; history.length < 30 && i < 50; i++) {
-        if (ptr.getDay() !== 0 && ptr.getDay() !== 6) {
+        if (isMonthly || (ptr.getDay() !== 0 && ptr.getDay() !== 6)) {
             const pad = n => String(n).padStart(2, '0');
             const dateStr = `${pad(ptr.getDate())}/${pad(ptr.getMonth()+1)}/${ptr.getFullYear()}`;
             const vol = metricId === 'dolar' ? 0.005 : 0.015;
             currVal = currVal * (1 + (Math.random() - 0.48) * vol);
             history.push({ date: dateStr, value: currVal });
         }
-        ptr.setDate(ptr.getDate() - 1);
+        if (isMonthly) {
+            ptr.setMonth(ptr.getMonth() - 1);
+        } else {
+            ptr.setDate(ptr.getDate() - 1);
+        }
     }
     return history;
 }
@@ -364,7 +369,8 @@ function renderIndicator(ind) {
 
     if (data.history.length > 0) {
         const oldest30 = data.history[data.history.length - 1].value;
-        updateBadge('30d', ((currentVal - oldest30) / oldest30) * 100, "30 dias");
+        const badgeLabel = ind.type === 'fred' ? "30 meses" : "30 dias";
+        updateBadge('30d', ((currentVal - oldest30) / oldest30) * 100, badgeLabel);
     }
 
     const badgeContainer6m  = document.getElementById('badge-container-6m');
@@ -395,7 +401,8 @@ function renderIndicator(ind) {
     const varIcon      = document.getElementById('current-variation-icon');
     const varContainer = document.getElementById('current-variation-container');
     const v = data.current.variation;
-    varEl.innerText = `${Math.abs(v).toFixed(2)}% vs Dia Anterior`;
+    const varLabel = ind.type === 'fred' ? 'Mês Anterior' : 'Dia Anterior';
+    varEl.innerText = `${Math.abs(v).toFixed(2)}% vs ${varLabel}`;
     varContainer.classList.remove('text-green-600', 'text-red-600', 'text-gray-500');
     if      (v > 0) { varContainer.classList.add('text-green-600'); varIcon.innerText = 'trending_up'; }
     else if (v < 0) { varContainer.classList.add('text-red-600');   varIcon.innerText = 'trending_down'; }
@@ -483,7 +490,8 @@ function renderChart(historyData, ind) {
     } else if (ind.currency === 'BRL' || (!ind.currency && ind.unit !== 'índice')) {
         prefix = 'R$';
     }
-    const seriesLabel = ind.id === 'dolar' ? `R$ Dólar do dia` : `${prefix} ${ind.name} do dia`;
+    const timeLabel = ind.type === 'fred' ? 'mês' : 'dia';
+    const seriesLabel = ind.id === 'dolar' ? `R$ Dólar do dia` : `${prefix} ${ind.name} do ${timeLabel}`;
 
     // Atualiza a Legenda Customizada do HTML
     const legendLabelHtml = document.getElementById('custom-legend-bar-label');
@@ -499,7 +507,7 @@ function renderChart(historyData, ind) {
             datasets: [
                 {
                     type: 'line',
-                    label: '% Variação do dia',
+                    label: `% Variação do ${timeLabel}`,
                     data: variations,
                     borderColor: '#4A4A4A', backgroundColor: '#4A4A4A',
                     borderWidth: 2, tension: 0.5, yAxisID: 'y1',
@@ -568,7 +576,7 @@ function renderChart(historyData, ind) {
                 },
                 y1: { 
                     type: 'linear', position: 'right', 
-                    title: { display: true, text: 'Variação Diária (%)' }, 
+                    title: { display: true, text: `Variação ${ind.type === 'fred' ? 'Mensal' : 'Diária'} (%)` }, 
                     grid: { drawOnChartArea: false },
                     grace: '15%' // Adiciona respiro/espaço extra no limite do eixo para rótulos altos
                 }
