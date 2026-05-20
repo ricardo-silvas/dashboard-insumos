@@ -19,7 +19,7 @@ const INDICATORS = [
     { id: 'cafe_robusta',   name: 'Café Robusta',    subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'sc 60kg',    url: 'https://www.cepea.org.br/br/indicador/cafe.aspx',                                                 type: 'cepea', selector: '#imagenet-indicador2' },
     { id: 'acucar_cristal', name: 'Açúcar Cristal',  subtitle: 'Empacotado SP - CEPEA/ESALQ',            unit: 'sc 50kg',    url: 'https://www.cepea.org.br/br/indicador/acucar-cristal-empacotado-cepea-esalq-sao-paulo.aspx',       type: 'cepea' },
     { id: 'acucar_ref',     name: 'Açúcar Refinado', subtitle: 'Amorfo SP - CEPEA/ESALQ',                unit: 'sc 50kg',    url: 'https://www.cepea.org.br/br/indicador/acucar-refinado-amorfo-sp.aspx',                             type: 'cepea' },
-    { id: 'aluminio',       name: 'Alumínio (LME)',  subtitle: 'Yahoo Finance',                          unit: 'tonelada',   currency: 'USD', type: 'yahoo', symbol: 'ALI=F' }
+    { id: 'aluminio',       name: 'Alumínio (LME)',  subtitle: 'Yahoo Finance',                          unit: 'tonelada',   currency: 'BRL', type: 'yahoo', symbol: 'ALI=F' }
 ];
 
 let currentIndex = 0;
@@ -90,6 +90,20 @@ async function fetchAllData() {
 
             } else if (ind.type === 'yahoo') {
                 history = await fetchYahoo(ind.symbol);
+                if (ind.currency === 'BRL') {
+                    // Converter USD para BRL usando a cotação atual ou histórico do dólar
+                    const dolarData = globalData['dolar'] ? globalData['dolar'].history : null;
+                    const currentDolar = dolarData && dolarData.length > 0 ? dolarData[0].value : 5.20;
+                    
+                    history = history.map(h => {
+                        let tax = currentDolar;
+                        if (dolarData) {
+                            const dMatch = dolarData.find(d => d.date === h.date);
+                            if (dMatch) tax = dMatch.value;
+                        }
+                        return { date: h.date, value: h.value * tax };
+                    });
+                }
             } else if (ind.type === 'fred') {
                 history = await fetchFRED(ind.series_id);
             } else if (ind.type === 'mock') {
