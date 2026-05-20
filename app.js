@@ -503,6 +503,9 @@ function renderChart(historyData, ind) {
     const legendLabelHtml = document.getElementById('custom-legend-bar-label');
     if (legendLabelHtml) legendLabelHtml.innerText = seriesLabel;
 
+    const variationLabelHtml = document.getElementById('custom-legend-variation-label');
+    if (variationLabelHtml) variationLabelHtml.innerText = `% Variação do ${timeLabel}`;
+
     Chart.register(ChartDataLabels);
 
     myChart = new Chart(ctx, {
