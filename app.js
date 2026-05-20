@@ -465,7 +465,13 @@ function renderChart(historyData, ind) {
     const chartData = [...historyData].slice(0, 30).reverse();
 
     // Mapeamento e cálculo de variação inter-diária
-    const labels = chartData.map(d => d.date.substring(0, 5)); // Exibe somente DD/MM para manter o eixo x limpo
+    const labels = chartData.map(d => {
+        if (ind.type === 'fred') {
+            const parts = d.date.split('/');
+            if (parts.length === 3) return `${parts[1]}/${parts[2].substring(2)}`; // MM/YY
+        }
+        return d.date.substring(0, 5); // DD/MM
+    });
     const values = chartData.map(d => d.value);
     const variations = chartData.map((item, index) => {
         if (index === 0) return 0;
