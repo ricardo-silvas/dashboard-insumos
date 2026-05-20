@@ -10,7 +10,7 @@ const INDICATORS = [
     { id: 'dolar',          name: 'Dólar Comercial', subtitle: 'Banco Central do Brasil / PTAX',          unit: '',           type: 'dolar' },
     { id: 'algodao',        name: 'Algodão',         subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'libra-peso', url: 'https://www.cepea.org.br/br/indicador/algodao.aspx',                                              type: 'cepea', selector: '#imagenet-indicador1' },
     { id: 'etanol',         name: 'Etanol',          subtitle: 'Semanal Hidratado - SP CEPEA',           unit: 'litro',      url: 'https://www.cepea.org.br/br/indicador/etanol.aspx',                                               type: 'cepea', selector: '#imagenet-indicador3' },
-    { id: 'brent',          name: 'Petróleo Brent',  subtitle: 'Yahoo Finance',                          unit: 'barril',     currency: 'USD', type: 'yahoo_brent' },
+    { id: 'brent',          name: 'Petróleo Brent',  subtitle: 'Yahoo Finance',                          unit: 'barril',     currency: 'USD', type: 'yahoo', symbol: 'BZ=F' },
     { id: 'ps',             name: 'Poliestireno (PS)',subtitle: 'Índice de Preços FRED (USA)',           unit: 'índice',     currency: 'USD', type: 'fred', series_id: 'PCU326140326140' },
     { id: 'pp',             name: 'Polipropileno (PP)',subtitle:'Índice de Preços FRED (USA)',           unit: 'índice',     currency: 'USD', type: 'fred', series_id: 'PCU325211325211' },
     { id: 'celulose_curta', name: 'Celulose Curta',  subtitle: 'WPU0911 FRED (USA)',                     unit: 'tonelada',   currency: 'USD', type: 'fred', series_id: 'WPU0911' },
@@ -19,7 +19,7 @@ const INDICATORS = [
     { id: 'cafe_robusta',   name: 'Café Robusta',    subtitle: 'Mercado Físico - CEPEA/ESALQ',           unit: 'sc 60kg',    url: 'https://www.cepea.org.br/br/indicador/cafe.aspx',                                                 type: 'cepea', selector: '#imagenet-indicador2' },
     { id: 'acucar_cristal', name: 'Açúcar Cristal',  subtitle: 'Empacotado SP - CEPEA/ESALQ',            unit: 'sc 50kg',    url: 'https://www.cepea.org.br/br/indicador/acucar-cristal-empacotado-cepea-esalq-sao-paulo.aspx',       type: 'cepea' },
     { id: 'acucar_ref',     name: 'Açúcar Refinado', subtitle: 'Amorfo SP - CEPEA/ESALQ',                unit: 'sc 50kg',    url: 'https://www.cepea.org.br/br/indicador/acucar-refinado-amorfo-sp.aspx',                             type: 'cepea' },
-    { id: 'aluminio',       name: 'Alumínio (LME)',  subtitle: 'London Metal Exchange (Dados Estimados)', unit: 'tonelada',   currency: 'BRL', type: 'mock' }
+    { id: 'aluminio',       name: 'Alumínio (LME)',  subtitle: 'Yahoo Finance',                          unit: 'tonelada',   currency: 'USD', type: 'yahoo', symbol: 'ALI=F' }
 ];
 
 let currentIndex = 0;
@@ -88,8 +88,8 @@ async function fetchAllData() {
                     val12m  = dolarResult.val12m;
                 }
 
-            } else if (ind.type === 'yahoo_brent') {
-                history = await fetchYahooBrent();
+            } else if (ind.type === 'yahoo') {
+                history = await fetchYahoo(ind.symbol);
             } else if (ind.type === 'fred') {
                 history = await fetchFRED(ind.series_id);
             } else if (ind.type === 'mock') {
@@ -228,8 +228,7 @@ async function fetchDolar() {
 // ──────────────────────────────────────────────
 //  YAHOO & FRED APIs
 // ──────────────────────────────────────────────
-async function fetchYahooBrent() {
-    const symbol = 'BZ=F'; // Brent Crude Oil Futures
+async function fetchYahoo(symbol) {
     const url = `${CORS_PROXY}${encodeURIComponent(`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=60d&_=${Date.now()}`)}`;
     try {
         const res = await fetch(url);
